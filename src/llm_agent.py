@@ -202,14 +202,7 @@ class EcoLoopAgent:
                 messages=[
                     {"role": "system", "content": SYSTEM_PROMPT},
                     {"role": "user", "content": user_prompt},
-                ],
-                format="json",
-                options={
-                    "temperature": 0.1,      # Low temp for consistent, deterministic output
-                    "top_p": 0.9,
-                    "num_predict": 200,       # Increased to ensure it finishes JSON
-                    "num_ctx": 2048,          # Small context — we don't need much
-                },
+                ]
             )
             
             latency = time.time() - start

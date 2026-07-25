@@ -295,7 +295,7 @@ class EnergyPlusWrapper:
         facility_power_w = facility_energy_j / (zone_ts * 3600) if zone_ts > 0 else 0
         hvac_power_w = hvac_energy_j / (zone_ts * 3600) if zone_ts > 0 else 0
         
-        self.total_energy_j += facility_energy_j
+        self.total_energy_j += hvac_energy_j  # Focus purely on HVAC energy savings
         
         data = {
             "timestamp": f"{month:02d}/{day:02d} {hour:02d}:{minute:02d}",

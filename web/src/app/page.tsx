@@ -51,7 +51,7 @@ export default function Dashboard() {
         <div className="absolute bottom-[-20%] right-[-10%] w-[50%] h-[50%] rounded-full bg-blue-600/10 blur-[120px]" />
       </div>
 
-      <div className="relative z-10 container mx-auto px-4 py-8 max-w-7xl">
+      <div className="relative z-10 mx-auto px-6 lg:px-8 py-8 w-full max-w-[1800px]">
         {/* Header */}
         <header className="flex items-center justify-between mb-10">
           <div className="flex items-center gap-3">

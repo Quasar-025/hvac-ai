@@ -8,11 +8,7 @@ import * as THREE from 'three';
 function Building() {
   const group = useRef<THREE.Group>(null);
 
-  useFrame((state) => {
-    if (group.current) {
-      group.current.rotation.y = state.clock.elapsedTime * 0.1;
-    }
-  });
+  // Remove explicit useFrame rotation to allow OrbitControls to handle it interactively
 
   const zonePositions = [
     [-1, 0.5, -0.5], [1, 0.5, -0.5],
@@ -61,12 +57,15 @@ export default function DigitalTwin() {
       <div className="absolute top-4 left-4 z-10 bg-slate-800/80 backdrop-blur text-xs font-semibold px-2 py-1 rounded border border-slate-700 text-blue-400">
         LIVE DIGITAL TWIN
       </div>
+      <div className="absolute bottom-4 right-4 z-10 text-[10px] text-slate-500 bg-slate-900/50 px-2 py-1 rounded">
+        Drag to rotate • Scroll to zoom
+      </div>
       <Canvas camera={{ position: [4, 3, 5], fov: 45 }}>
         <ambientLight intensity={0.4} />
         <directionalLight position={[5, 5, 5]} intensity={0.8} color="#3b82f6" />
         <directionalLight position={[-5, 3, -5]} intensity={0.5} color="#10b981" />
         <Building />
-        <OrbitControls enableZoom={false} autoRotate={false} />
+        <OrbitControls enableZoom={true} enablePan={true} autoRotate={true} autoRotateSpeed={1} />
         <Environment preset="city" />
       </Canvas>
     </div>

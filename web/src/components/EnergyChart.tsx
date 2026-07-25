@@ -47,7 +47,12 @@ export default function EnergyChart({ baseData, optData }: EnergyChartProps) {
           plot_bgcolor: 'rgba(0,0,0,0)',
           font: { color: '#94a3b8', family: 'Inter, sans-serif' },
           margin: { t: 10, r: 10, b: 40, l: 50 },
-          xaxis: { gridcolor: 'rgba(255,255,255,0.05)', zerolinecolor: 'rgba(255,255,255,0.1)' },
+          xaxis: { 
+            gridcolor: 'rgba(255,255,255,0.05)', 
+            zerolinecolor: 'rgba(255,255,255,0.1)',
+            nticks: 8,
+            tickangle: 0
+          },
           yaxis: { gridcolor: 'rgba(255,255,255,0.05)', zerolinecolor: 'rgba(255,255,255,0.1)', title: 'Energy (kWh)' },
           legend: { orientation: 'h', y: -0.2 }
         }}
