@@ -161,10 +161,10 @@
 
   RunPeriod,
     Run Period 1,            !- Name
-    7,                       !- Begin Month
+    1,                       !- Begin Month
     1,                       !- Begin Day of Month
     ,                        !- Begin Year
-    7,                       !- End Month
+    12,                      !- End Month
     31,                      !- End Day of Month
     ,                        !- End Year
     Tuesday,                 !- Day of Week for Start Day
