@@ -3544,3 +3544,13 @@
 
   Output:Surfaces:List,ViewFactorInfo;
 
+  Output:Variable,*,Zone Air Temperature,Timestep;
+  Output:Variable,*,Zone People Occupant Count,Timestep;
+  Output:Variable,*,Site Outdoor Air Drybulb Temperature,Timestep;
+  Output:Variable,*,Site Outdoor Air Relative Humidity,Timestep;
+  Output:Variable,*,Facility Total HVAC Electricity Demand Rate,Timestep;
+  Output:Variable,*,Facility Total Electricity Demand Rate,Timestep;
+
+  Output:Meter,Electricity:Facility,Timestep;
+  Output:Meter,Electricity:HVAC,Timestep;
+

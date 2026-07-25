@@ -281,17 +281,21 @@ class EnergyPlusWrapper:
         ), 1)
         
         # Energy
-        facility_power_w = self.api.exchange.get_meter_value(
+        # Energy meters return Joules per timestep
+        facility_energy_j = self.api.exchange.get_meter_value(
             state, self._facility_power_handle
         )
-        hvac_power_w = self.api.exchange.get_meter_value(
+        hvac_energy_j = self.api.exchange.get_meter_value(
             state, self._hvac_power_handle
         )
         
-        # Get timestep duration for energy accumulation
+        # Get timestep duration in hours to calculate power in Watts
         zone_ts = self.api.exchange.zone_time_step(state)
-        energy_this_step_j = facility_power_w * zone_ts * 3600  # W * hours * 3600 = J
-        self.total_energy_j += energy_this_step_j
+        
+        facility_power_w = facility_energy_j / (zone_ts * 3600) if zone_ts > 0 else 0
+        hvac_power_w = hvac_energy_j / (zone_ts * 3600) if zone_ts > 0 else 0
+        
+        self.total_energy_j += facility_energy_j
         
         data = {
             "timestamp": f"{month:02d}/{day:02d} {hour:02d}:{minute:02d}",
