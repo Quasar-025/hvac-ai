@@ -11,7 +11,7 @@ interface TempChartProps {
 export default function TempChart({ optData }: TempChartProps) {
   if (!optData.length) return <div className="h-[300px] flex items-center justify-center text-slate-500">Loading chart...</div>;
 
-  const time = optData.map(d => d.timestamp);
+  const time = optData.map(d => new Date(2026, d.month - 1, d.day, d.hour, d.minute));
   
   // Safe extraction with fallbacks
   const htgSp = optData.map(d => d.zones?.['SPACE1-1']?.htg_setpoint_c ?? 20);

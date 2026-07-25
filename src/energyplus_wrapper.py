@@ -271,6 +271,16 @@ class EnergyPlusWrapper:
                     state, self._zone_occupancy_handles[zone]
                 ), 1),
             }
+            
+            # Synthesize PMV and CO2 (Hackathon feedback requirements)
+            temp = zones[zone]["temp_c"]
+            occ = zones[zone]["occupancy"]
+            
+            # Fanger PMV approximation (Ideal = 22.5°C)
+            zones[zone]["pmv"] = round((temp - 22.5) * 0.33, 2)
+            
+            # CO2 approximation (Baseline 400 ppm + 25 ppm per occupant)
+            zones[zone]["co2_ppm"] = round(400 + (occ * 25), 1)
         
         # Outdoor conditions
         outdoor_temp = round(self.api.exchange.get_variable_value(
@@ -297,6 +307,14 @@ class EnergyPlusWrapper:
         
         self.total_energy_j += hvac_energy_j  # Focus purely on HVAC energy savings
         
+        # Synthesize Local Carbon Grid Intensity (gCO2/kWh) - Duck curve peaking at 6-9 PM
+        if 17 <= hour <= 21:
+            grid_carbon = 450.0  # High carbon peak
+        elif 10 <= hour <= 15:
+            grid_carbon = 150.0  # Solar abundance
+        else:
+            grid_carbon = 300.0  # Baseline coal/gas
+            
         data = {
             "timestamp": f"{month:02d}/{day:02d} {hour:02d}:{minute:02d}",
             "month": month,
@@ -309,6 +327,7 @@ class EnergyPlusWrapper:
             "facility_power_w": round(facility_power_w, 1),
             "hvac_power_w": round(hvac_power_w, 1),
             "total_energy_kwh": round(self.total_energy_j / 3_600_000, 2),
+            "grid_carbon_intensity_g_kwh": grid_carbon,
             "timestep_count": self.timestep_count,
         }
         
@@ -392,6 +411,35 @@ class EnergyPlusWrapper:
                     print(f"[WARN] AI agent error at ts={self.timestep_count}: {e}")
                     if self._last_actions:
                         self.apply_control_actions(state, self._last_actions)
+                
+                # Periodically save data to disk so the dashboard updates live!
+                try:
+                    mode = "optimized" if self.ai_enabled else "baseline"
+                    
+                    # Also save to data directory for the UI
+                    data_dir = os.path.join(os.path.dirname(os.path.dirname(self.output_dir)), "data")
+                    
+                    sample_rate = max(1, len(self.timestep_data) // 2000)
+                    sampled_data = self.timestep_data[::sample_rate]
+                    
+                    # Save to output_dir
+                    with open(os.path.join(self.output_dir, f"{mode}_timestep_data.json"), "w") as f:
+                        json.dump(sampled_data, f, indent=2)
+                    
+                    # Save to data_dir for UI live updates
+                    with open(os.path.join(data_dir, f"{mode}_timestep_data.json"), "w") as f:
+                        json.dump(sampled_data, f, indent=2)
+                        
+                    if self.control_actions_log:
+                        # Save to output_dir
+                        with open(os.path.join(self.output_dir, f"{mode}_control_actions.json"), "w") as f:
+                            json.dump(self.control_actions_log[-50:], f, indent=2)
+                            
+                        # Save to data_dir with the name the UI expects
+                        with open(os.path.join(data_dir, "control_actions.json"), "w") as f:
+                            json.dump(self.control_actions_log[-50:], f, indent=2)
+                except Exception as e:
+                    print(f"[WARN] Failed to write live data: {e}")
 
     def _request_variables(self, state):
         """Request all needed output variables before simulation starts."""

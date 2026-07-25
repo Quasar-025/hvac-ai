@@ -40,12 +40,11 @@ RULES:
 5. cooling_setpoint must be at least 1°C above heating_setpoint.
 6. During unoccupied hours: widen the deadband (lower heating, raise cooling) to save energy.
 7. During occupied hours: keep zones comfortable but optimize aggressively.
-8. When outdoor temp is mild (18-24°C): widen deadband significantly — free cooling potential.
-9. When outdoor temp is very hot (>30°C): don't fight it too hard, accept 25°C.
-10. When outdoor temp is cold (<5°C): accept 20°C minimum, don't overheat.
+8. Peak Demand & Carbon: When Local Carbon Grid Intensity > 300 gCO2/kWh, heavily widen deadbands to shed load!
+9. Air Quality & PMV: If CO2 > 1000 ppm or PMV goes beyond +/- 1.0, prioritize comfort over energy savings.
 
 RESPONSE FORMAT (strict JSON, no markdown, no explanation outside JSON):
-{"heating_setpoint": <float>, "cooling_setpoint": <float>, "reasoning": "<brief 1-line reason>"}"""
+{"heating_setpoint": <float>, "cooling_setpoint": <float>, "reasoning": "<brief 1-line reason, mention carbon/PMV if applicable>"}"""
 
 
 def format_sensor_summary(sensor_data: dict) -> str:
@@ -71,16 +70,23 @@ def format_sensor_summary(sensor_data: dict) -> str:
     hour = sensor_data.get("hour", 12)
     is_occupied = 6 <= hour < 20
     
+    # New Hackathon Metrics
+    pmvs = [z.get("pmv", 0) for z in zones.values()]
+    co2s = [z.get("co2_ppm", 400) for z in zones.values()]
+    avg_pmv = sum(pmvs) / len(pmvs) if pmvs else 0
+    avg_co2 = sum(co2s) / len(co2s) if co2s else 400
+    grid_carbon = sensor_data.get("grid_carbon_intensity_g_kwh", 300.0)
+    
     summary = (
         f"Time: {sensor_data.get('timestamp', 'N/A')} | "
         f"{'OCCUPIED' if is_occupied else 'UNOCCUPIED'}\n"
         f"Outdoor: {sensor_data.get('outdoor_temp_c', 0)}°C, "
         f"RH: {sensor_data.get('outdoor_rh_pct', 0)}%\n"
         f"Zone temps: avg={avg_temp:.1f}°C, min={min_temp:.1f}°C, max={max_temp:.1f}°C\n"
-        f"Occupancy: {total_occupancy:.0f} people\n"
+        f"Occupancy: {total_occupancy:.0f} people | CO2: {avg_co2:.0f} ppm | PMV: {avg_pmv:.2f}\n"
         f"Current setpoints: heating={current_htg}°C, cooling={current_clg}°C\n"
         f"HVAC power: {sensor_data.get('hvac_power_w', 0):.0f}W | "
-        f"Total energy so far: {sensor_data.get('total_energy_kwh', 0):.1f} kWh\n"
+        f"Grid Carbon: {grid_carbon:.0f} gCO2/kWh\n"
         f"Decide optimal setpoints."
     )
     
@@ -109,17 +115,20 @@ def parse_llm_response(response_text: str) -> Optional[dict]:
     start = text.find("{")
     end = text.rfind("}")
     if start == -1 or end == -1 or start >= end:
+        print(f"[DEBUG-PARSE] Missing brackets in text: {text}")
         return None
     
     json_str = text[start:end + 1]
     
     try:
         data = json.loads(json_str)
-    except json.JSONDecodeError:
+    except json.JSONDecodeError as e:
+        print(f"[DEBUG-PARSE] JSONDecodeError: {e} on string: {json_str}")
         return None
     
     # Validate required fields
     if "heating_setpoint" not in data or "cooling_setpoint" not in data:
+        print(f"[DEBUG-PARSE] Missing required fields in: {data}")
         return None
     
     htg = data["heating_setpoint"]
@@ -127,10 +136,12 @@ def parse_llm_response(response_text: str) -> Optional[dict]:
     
     # Validate types
     if not isinstance(htg, (int, float)) or not isinstance(clg, (int, float)):
+        print(f"[DEBUG-PARSE] Invalid types for setpoints: htg={htg}, clg={clg}")
         return None
     
     # Validate ranges (strict — reject hallucinated values)
     if htg < 10 or htg > 30 or clg < 15 or clg > 35:
+        print(f"[DEBUG-PARSE] Out of bounds: htg={htg}, clg={clg}")
         return None
     
     return {
@@ -199,6 +210,8 @@ class EcoLoopAgent:
             # Call Ollama
             response = ollama.chat(
                 model=self.model,
+                format="json",
+                options={"num_ctx": 8192},
                 messages=[
                     {"role": "system", "content": SYSTEM_PROMPT},
                     {"role": "user", "content": user_prompt},

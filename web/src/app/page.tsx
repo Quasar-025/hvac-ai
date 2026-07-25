@@ -6,9 +6,11 @@ import DigitalTwin from '@/components/DigitalTwin';
 import EnergyChart from '@/components/EnergyChart';
 import TempChart from '@/components/TempChart';
 import LogViewer from '@/components/LogViewer';
-import { Leaf } from 'lucide-react';
+import AgentPipeline from '@/components/AgentPipeline';
+import { Leaf, Activity, BarChart2 } from 'lucide-react';
 
 export default function Dashboard() {
+  const [viewMode, setViewMode] = useState<'dashboard' | 'pipeline'>('dashboard');
   const [results, setResults] = useState<any>(null);
   const [baseData, setBaseData] = useState<any[]>([]);
   const [optData, setOptData] = useState<any[]>([]);
@@ -17,11 +19,12 @@ export default function Dashboard() {
 
   const fetchData = async () => {
     try {
+      const t = Date.now();
       const [resData, baseRes, optRes, actRes] = await Promise.all([
-        fetch('/api/data?type=results').then(r => r.json()).catch(() => null),
-        fetch('/api/data?type=baseline').then(r => r.json()).catch(() => []),
-        fetch('/api/data?type=optimized').then(r => r.json()).catch(() => []),
-        fetch('/api/data?type=actions').then(r => r.json()).catch(() => [])
+        fetch(`/api/data?type=results&t=${t}`).then(r => r.json()).catch(() => null),
+        fetch(`/api/data?type=baseline&t=${t}`).then(r => r.json()).catch(() => []),
+        fetch(`/api/data?type=optimized&t=${t}`).then(r => r.json()).catch(() => []),
+        fetch(`/api/data?type=actions&t=${t}`).then(r => r.json()).catch(() => [])
       ]);
 
       if (resData && !resData.error) setResults(resData);
@@ -64,9 +67,26 @@ export default function Dashboard() {
             </div>
           </div>
           
-          <div className="flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/20 px-4 py-2 rounded-full">
-            <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
-            <span className="text-sm font-medium text-emerald-400">AI Active</span>
+          <div className="flex items-center gap-4">
+            <div className="flex bg-slate-900/50 p-1 rounded-lg border border-slate-700/50">
+              <button 
+                onClick={() => setViewMode('dashboard')}
+                className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${viewMode === 'dashboard' ? 'bg-emerald-500/20 text-emerald-400' : 'text-slate-400 hover:text-slate-200'}`}
+              >
+                <BarChart2 size={16} /> Analytics
+              </button>
+              <button 
+                onClick={() => setViewMode('pipeline')}
+                className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${viewMode === 'pipeline' ? 'bg-purple-500/20 text-purple-400' : 'text-slate-400 hover:text-slate-200'}`}
+              >
+                <Activity size={16} /> Pipeline
+              </button>
+            </div>
+            
+            <div className="flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/20 px-4 py-2 rounded-full">
+              <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+              <span className="text-sm font-medium text-emerald-400">AI Active</span>
+            </div>
           </div>
         </header>
 
@@ -80,30 +100,35 @@ export default function Dashboard() {
             {/* KPI Section */}
             <KPIBoard results={results} />
 
-            {/* Main Content Grid */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              
-              {/* Left Column - Charts */}
-              <div className="lg:col-span-2 space-y-6">
-                <div className="bg-slate-900/40 backdrop-blur-md border border-slate-700/50 rounded-2xl p-6 shadow-xl">
-                  <h2 className="text-lg font-semibold text-slate-200 mb-4">Energy Profile (Baseline vs AI)</h2>
-                  <EnergyChart baseData={baseData} optData={optData} />
-                </div>
+            {/* Conditional Views */}
+            {viewMode === 'dashboard' ? (
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 
-                <div className="bg-slate-900/40 backdrop-blur-md border border-slate-700/50 rounded-2xl p-6 shadow-xl">
-                  <h2 className="text-lg font-semibold text-slate-200 mb-4">Zone Temperatures & AI Setpoints</h2>
-                  <TempChart optData={optData} />
+                {/* Left Column - Charts */}
+                <div className="lg:col-span-2 space-y-6">
+                  <div className="bg-slate-900/40 backdrop-blur-md border border-slate-700/50 rounded-2xl p-6 shadow-xl">
+                    <h2 className="text-lg font-semibold text-slate-200 mb-4">Energy Profile (Baseline vs AI)</h2>
+                    <EnergyChart baseData={baseData} optData={optData} />
+                  </div>
+                  
+                  <div className="bg-slate-900/40 backdrop-blur-md border border-slate-700/50 rounded-2xl p-6 shadow-xl">
+                    <h2 className="text-lg font-semibold text-slate-200 mb-4">Zone Temperatures & AI Setpoints</h2>
+                    <TempChart optData={optData} />
+                  </div>
                 </div>
-              </div>
 
-              {/* Right Column - 3D & Logs */}
-              <div className="space-y-6 flex flex-col">
-                <DigitalTwin />
-                <div className="flex-1 min-h-[400px]">
+                {/* Right Column - 3D & Logs */}
+                <div className="space-y-6 flex flex-col">
+                  <DigitalTwin latestData={optData[optData.length - 1]} />
                   <LogViewer actions={actions} />
                 </div>
               </div>
-            </div>
+            ) : (
+              <AgentPipeline 
+                latestData={optData[optData.length - 1]} 
+                latestAction={actions[actions.length - 1]} 
+              />
+            )}
           </>
         )}
       </div>

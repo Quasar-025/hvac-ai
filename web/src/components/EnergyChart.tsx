@@ -12,8 +12,8 @@ interface EnergyChartProps {
 export default function EnergyChart({ baseData, optData }: EnergyChartProps) {
   if (!baseData.length || !optData.length) return <div className="h-[300px] flex items-center justify-center text-slate-500">Loading chart...</div>;
 
-  const timeBase = baseData.map(d => d.timestamp);
-  const timeOpt = optData.map(d => d.timestamp);
+  const timeBase = baseData.map(d => new Date(2026, d.month - 1, d.day, d.hour, d.minute));
+  const timeOpt = optData.map(d => new Date(2026, d.month - 1, d.day, d.hour, d.minute));
   
   const eBase = baseData.map(d => d.total_energy_kwh);
   const eOpt = optData.map(d => d.total_energy_kwh);
