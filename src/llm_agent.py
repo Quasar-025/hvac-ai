@@ -45,9 +45,7 @@ RULES:
 10. When outdoor temp is cold (<5°C): accept 20°C minimum, don't overheat.
 
 RESPONSE FORMAT (strict JSON, no markdown, no explanation outside JSON):
-{"heating_setpoint": <float>, "cooling_setpoint": <float>, "reasoning": "<brief 1-line reason>"}
-
-/no_think"""
+{"heating_setpoint": <float>, "cooling_setpoint": <float>, "reasoning": "<brief 1-line reason>"}"""
 
 
 def format_sensor_summary(sensor_data: dict) -> str:
@@ -208,7 +206,7 @@ class EcoLoopAgent:
                 options={
                     "temperature": 0.1,      # Low temp for consistent, deterministic output
                     "top_p": 0.9,
-                    "num_predict": 100,       # Short response — just JSON
+                    "num_predict": 200,       # Increased to ensure it finishes JSON
                     "num_ctx": 2048,          # Small context — we don't need much
                 },
             )

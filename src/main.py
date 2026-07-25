@@ -23,6 +23,7 @@ import json
 import argparse
 import threading
 import time
+import signal
 
 # Add project root to path
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -31,6 +32,16 @@ sys.path.insert(0, PROJECT_ROOT)
 from src.energyplus_wrapper import EnergyPlusWrapper
 from src.llm_agent import EcoLoopAgent
 from src.mcp_server import mcp_server, app
+
+# Global flag for Ctrl+C
+STOP_SIMULATION = False
+
+def signal_handler(sig, frame):
+    global STOP_SIMULATION
+    print("\n[INFO] Ctrl+C detected. Gracefully aborting simulation...")
+    STOP_SIMULATION = True
+    
+signal.signal(signal.SIGINT, signal_handler)
 
 # Paths
 ENERGYPLUS_DIR = r"C:\EnergyPlusV26-1-0"
@@ -65,6 +76,11 @@ def run_simulation(mode: str, wrapper: EnergyPlusWrapper,
     
     def agent_callback(sensor_data):
         """Callback that bridges EnergyPlus → MCP → LLM → EnergyPlus."""
+        global STOP_SIMULATION
+        if STOP_SIMULATION:
+            print("[INFO] Aborting from inside EnergyPlus callback...")
+            os._exit(0)  # Force exit immediately since sys.exit() might be caught by EnergyPlus
+            
         # Update MCP server state
         mcp_server.update_state(sensor_data)
         
@@ -155,12 +171,14 @@ def main():
     parser = argparse.ArgumentParser(description="Eco-Loop Building Agents")
     parser.add_argument("--months", type=int, nargs="+", default=[7],
                         help="Month(s) to simulate (default: 7 for July)")
+    parser.add_argument("--days", type=int, default=7,
+                        help="Number of days to simulate in the first month (default: 7)")
     parser.add_argument("--full-year", action="store_true",
                         help="Simulate the full year (Jan-Dec)")
     parser.add_argument("--verbose", action="store_true",
                         help="Show detailed LLM agent output")
-    parser.add_argument("--interval", type=int, default=4,
-                        help="Call LLM every N timesteps (default: 4)")
+    parser.add_argument("--interval", type=int, default=24,
+                        help="Call LLM every N timesteps (default: 24, which is hourly if 4ts/hr)")
     parser.add_argument("--model", type=str, 
                         default="huihui_ai/qwen3.5-abliterated:9b",
                         help="Ollama model name")
@@ -178,7 +196,7 @@ def main():
         begin_month = args.months[0]
         begin_day = 1
         end_month = args.months[0]
-        end_day = MONTH_DAYS.get(args.months[0], 31)
+        end_day = min(args.days, MONTH_DAYS.get(args.months[0], 31))
     else:
         begin_month = min(args.months)
         begin_day = 1
