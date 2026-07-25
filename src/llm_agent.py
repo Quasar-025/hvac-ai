@@ -27,8 +27,8 @@ except ImportError:
 # Default model configuration
 DEFAULT_MODEL = "huihui_ai/qwen3.5-abliterated:9b"
 
-# System prompt — carefully engineered to prevent hallucination
-SYSTEM_PROMPT = """You are an AI building energy management agent controlling a 5-zone office HVAC system in Chicago.
+# Performance Mode Prompt - 100% Thermal Comfort
+SYSTEM_PROMPT_PERFORMANCE = """You are an AI building energy management agent controlling a 5-zone office HVAC system in Chicago.
 
 YOUR OBJECTIVE: Achieve a PERFECT 100% thermal comfort score by strictly keeping ALL zones between 19.5°C and 25.5°C at ALL TIMES (24/7), while minimizing energy use within these rigid bounds.
 
@@ -42,6 +42,25 @@ RULES:
 7. Unoccupied hours (20:00-06:00): Save energy by resting exactly at the extreme edges of the bounds (htg=19.5, clg=25.5). DO NOT use traditional extreme setbacks.
 8. Peak Demand & Carbon: When Grid Intensity > 300 gCO2/kWh, shed load by going to max cooling (25.5) and min heating (19.5).
 9. Air Quality & PMV: If CO2 > 1000 ppm or PMV goes beyond +/- 1.0, prioritize comfort by narrowing the deadband slightly.
+
+RESPONSE FORMAT (strict JSON, no markdown, no explanation outside JSON):
+{"heating_setpoint": <float>, "cooling_setpoint": <float>, "reasoning": "<brief 1-line reason, mention carbon/PMV if applicable>"}"""
+
+# Eco Mode Prompt - Maximum Energy Savings
+SYSTEM_PROMPT_ECO = """You are an AI building energy management agent controlling a 5-zone office HVAC system in Chicago.
+
+YOUR OBJECTIVE: Minimize energy consumption while keeping ALL zones between 20°C and 25°C during occupied hours (6:00-20:00) and between 15°C and 28°C during unoccupied hours.
+
+RULES:
+1. You receive REAL sensor data from EnergyPlus. Do NOT invent or assume data.
+2. You must respond with ONLY a valid JSON object — no text before or after.
+3. heating_setpoint must be between 15.0 and 24.0 °C.
+4. cooling_setpoint must be between 21.0 and 26.0 °C.
+5. cooling_setpoint must be at least 1°C above heating_setpoint.
+6. During unoccupied hours: widen the deadband (lower heating, raise cooling) to save energy.
+7. During occupied hours: keep zones comfortable but optimize aggressively.
+8. Peak Demand & Carbon: When Local Carbon Grid Intensity > 300 gCO2/kWh, heavily widen deadbands to shed load!
+9. Air Quality & PMV: If CO2 > 1000 ppm or PMV goes beyond +/- 1.0, prioritize comfort over energy savings.
 
 RESPONSE FORMAT (strict JSON, no markdown, no explanation outside JSON):
 {"heating_setpoint": <float>, "cooling_setpoint": <float>, "reasoning": "<brief 1-line reason, mention carbon/PMV if applicable>"}"""
@@ -167,13 +186,15 @@ class EcoLoopAgent:
     a rule-based strategy to ensure building safety.
     """
 
-    def __init__(self, model: str = DEFAULT_MODEL, verbose: bool = False):
+    def __init__(self, model: str = DEFAULT_MODEL, verbose: bool = False, mode: str = "performance"):
         self.model = model
         self.verbose = verbose
+        self.mode = mode
         self.call_count = 0
         self.success_count = 0
         self.fallback_count = 0
         self.total_latency = 0.0
+        self.system_prompt = SYSTEM_PROMPT_ECO if mode == "eco" else SYSTEM_PROMPT_PERFORMANCE
         
         # Verify Ollama is available
         if ollama is None:
@@ -211,10 +232,10 @@ class EcoLoopAgent:
             response = ollama.chat(
                 model=self.model,
                 format="json",
-                options={"num_ctx": 8192},
+                options={"num_ctx": 4096},
                 messages=[
-                    {"role": "system", "content": SYSTEM_PROMPT},
-                    {"role": "user", "content": user_prompt},
+                    {"role": "system", "content": self.system_prompt},
+                    {"role": "user", "content": user_prompt}
                 ]
             )
             

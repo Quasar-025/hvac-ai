@@ -186,6 +186,8 @@ def main():
                         help="Skip starting MCP server")
     parser.add_argument("--skip-baseline", action="store_true",
                         help="Skip baseline run (use existing data)")
+    parser.add_argument("--mode", type=str, choices=["eco", "performance"], default="performance",
+                        help="Select agent mode: 'eco' (max energy savings) or 'performance' (100% comfort)")
     args = parser.parse_args()
     
     # Determine simulation period
@@ -249,7 +251,7 @@ def main():
     print("\n[PHASE 2] Running AI-OPTIMIZED simulation...")
     
     # Initialize the LLM agent
-    agent = EcoLoopAgent(model=args.model, verbose=args.verbose)
+    agent = EcoLoopAgent(model=args.model, verbose=args.verbose, mode=args.mode)
     
     optimized_wrapper = EnergyPlusWrapper(BASELINE_IDF, WEATHER_FILE, OPTIMIZED_OUTPUT)
     optimized_results = run_simulation(
