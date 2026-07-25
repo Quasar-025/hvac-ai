@@ -203,6 +203,7 @@ class EcoLoopAgent:
                     {"role": "system", "content": SYSTEM_PROMPT},
                     {"role": "user", "content": user_prompt},
                 ],
+                format="json",
                 options={
                     "temperature": 0.1,      # Low temp for consistent, deterministic output
                     "top_p": 0.9,
