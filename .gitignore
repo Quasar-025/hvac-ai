@@ -1,0 +1,51 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+dist/
+build/
+.eggs/
+*.egg
+venv/
+.venv/
+env/
+
+# EnergyPlus output files
+*.eso
+*.err
+*.rdd
+*.mdd
+*.mtd
+*.shd
+*.audit
+*.bnd
+*.dxf
+*.eio
+*.end
+*.mtr
+*.svg
+*.tab
+*.html
+output/baseline/*.csv
+output/baseline/*.htm
+output/baseline/*.sql
+output/optimized/*.csv
+output/optimized/*.htm
+output/optimized/*.sql
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Project
+data/results.json
+test.py
+*.log
