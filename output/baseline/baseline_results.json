@@ -1,0 +1,21 @@
+{
+  "total_energy_kwh": 147.86,
+  "total_timesteps": 2976,
+  "avg_hvac_power_w": 198.7,
+  "avg_outdoor_temp_c": 24.1,
+  "comfort_pct": 94.5,
+  "comfort_violations": 815,
+  "total_comfort_readings": 14880,
+  "zone_avg_temps": {
+    "SPACE1-1": 23.02,
+    "SPACE2-1": 23.32,
+    "SPACE3-1": 23.21,
+    "SPACE4-1": 23.22,
+    "SPACE5-1": 22.81
+  },
+  "ai_enabled": false,
+  "control_actions_count": 0,
+  "sim_success": true,
+  "period": "7/1 - 7/31",
+  "elapsed_seconds": 0.8
+}

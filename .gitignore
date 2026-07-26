@@ -46,8 +46,36 @@ Thumbs.db
 desktop.ini
 
 # Project
-data/
-output/
 test.py
 *.log
 debug_llm.txt
+
+# EnergyPlus output artifacts (keep JSON results, exclude heavy binary/text outputs)
+output/baseline/*.eso
+output/baseline/*.err
+output/baseline/*.rdd
+output/baseline/*.mdd
+output/baseline/*.eio
+output/baseline/*.end
+output/baseline/*.mtr
+output/baseline/*.bnd
+output/baseline/*.shd
+output/baseline/*.audit
+output/baseline/*.dxf
+output/baseline/*.svg
+output/baseline/*.tab
+output/baseline/run_model.idf
+output/optimized/*.eso
+output/optimized/*.err
+output/optimized/*.rdd
+output/optimized/*.mdd
+output/optimized/*.eio
+output/optimized/*.end
+output/optimized/*.mtr
+output/optimized/*.bnd
+output/optimized/*.shd
+output/optimized/*.audit
+output/optimized/*.dxf
+output/optimized/*.svg
+output/optimized/*.tab
+output/optimized/run_model.idf

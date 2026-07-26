@@ -24,6 +24,7 @@ import argparse
 import threading
 import time
 import signal
+import shutil
 
 # Add project root to path
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -131,8 +132,7 @@ def run_simulation(mode: str, wrapper: EnergyPlusWrapper,
             mcp_server.broadcast("pipeline:injection", mcp_server._last_injection)
             
             # Brief pause to let frontend show injection state before returning to idle
-            import time as _time
-            _time.sleep(0.3)
+            time.sleep(0.3)
             mcp_server._pipeline_phase = "idle"
             mcp_server.broadcast("pipeline:phase", {"phase": "idle"})
             
@@ -326,13 +326,11 @@ def main():
         src_dir = BASELINE_OUTPUT if mode == "baseline" else OPTIMIZED_OUTPUT
         ts_file = os.path.join(src_dir, f"{mode}_timestep_data.json")
         if os.path.exists(ts_file):
-            import shutil
             shutil.copy2(ts_file, os.path.join(DATA_DIR, f"{mode}_timestep_data.json"))
     
     # Copy control actions to data dir
     actions_file = os.path.join(OPTIMIZED_OUTPUT, "optimized_control_actions.json")
     if os.path.exists(actions_file):
-        import shutil
         shutil.copy2(actions_file, os.path.join(DATA_DIR, "control_actions.json"))
     
     print("\n[DONE] Pipeline complete! The Next.js dashboard will reflect the latest data.")

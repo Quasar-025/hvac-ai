@@ -45,7 +45,7 @@ export default function KPIBoard({ results }: KPIProps) {
       title: 'Thermal Comfort',
       value: comfort.optimized_comfort_pct?.toFixed(1) || '--',
       unit: '%',
-      subtitle: 'Time within bounds (20–25°C)',
+      subtitle: 'Time within bounds (19–26°C)',
       icon: Thermometer,
       accentColor: 'var(--accent-warning)',
       accentDim: 'rgba(251, 191, 36, 0.08)',

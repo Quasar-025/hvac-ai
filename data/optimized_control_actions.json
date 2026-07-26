@@ -1,0 +1,74 @@
+[
+  {
+    "timestep": 24,
+    "heating_setpoint": 19.0,
+    "cooling_setpoint": 24.0,
+    "reasoning": "Widen deadband to manage humid early morning swing while optimizing output for mid-range carbon intensity."
+  },
+  {
+    "timestep": 48,
+    "heating_setpoint": 21.0,
+    "cooling_setpoint": 25.5,
+    "reasoning": "Widened upper deadband to accommodate high occupancy heat gain while leveraging low carbon grid intensity."
+  },
+  {
+    "timestep": 72,
+    "heating_setpoint": 23.0,
+    "cooling_setpoint": 26.0,
+    "reasoning": "Narrowed deadband focus (gap ~4\u00b0C) to capture internal heat from 52 people while maximizing cooling efficiency on high carbon grid."
+  },
+  {
+    "timestep": 96,
+    "heating_setpoint": 20.5,
+    "cooling_setpoint": 25.0,
+    "reasoning": "Narrowed heating deadband to counteract 17\u00b0C night chill while widening overall deadband span for energy savings under moderate grid carbon."
+  },
+  {
+    "timestep": 120,
+    "heating_setpoint": 19.5,
+    "cooling_setpoint": 26.0,
+    "reasoning": "Widened deadband for unoccupied morning to reduce HVAC cycling and leverage comfortable PMV against moderate grid carbon intensity."
+  },
+  {
+    "timestep": 144,
+    "heating_setpoint": 21.0,
+    "cooling_setpoint": 24.5,
+    "reasoning": "Narrowed deadband to aggressively balance high occupant heat gain and maintain max zone comfort under moderate carbon grid."
+  },
+  {
+    "timestep": 168,
+    "heating_setpoint": 20.5,
+    "cooling_setpoint": 24.8,
+    "reasoning": "Zones warm at 24.4\u00b0C avg with PMV 0.62 - widen cooling deadband slightly to save energy during high carbon grid (450 gCO2/kWh) while maintaining comfort under 52 occupants heat load."
+  },
+  {
+    "timestep": 192,
+    "heating_setpoint": 19.5,
+    "cooling_setpoint": 24.5,
+    "reasoning": "Unoccupied evening with 300 gCO2/kWh on grid - widened deadband to save energy while maintaining zone comfort within 15-28\u00b0C range."
+  },
+  {
+    "timestep": 216,
+    "heating_setpoint": 19.0,
+    "cooling_setpoint": 24.5,
+    "reasoning": "Unoccupied with cool outdoor air (13.9\u00b0C): widen deadband by slightly lowering heating threshold to let space utilize thermal mass."
+  },
+  {
+    "timestep": 240,
+    "heating_setpoint": 19.0,
+    "cooling_setpoint": 25.0,
+    "reasoning": "Widened deadband upper limit for maximum comfort against 23\u00b0C outdoor temp; maintained lower heating buffer to balance energy usage."
+  },
+  {
+    "timestep": 264,
+    "heating_setpoint": 19.0,
+    "cooling_setpoint": 24.5,
+    "reasoning": "Optimized for occupied PMV warmth and moderate-high Carbon intensity by widening deadband; zone temps are near limit requiring active cooling."
+  },
+  {
+    "timestep": 288,
+    "heating_setpoint": 19.0,
+    "cooling_setpoint": 25.0,
+    "reasoning": "Carbon at 300 widens deadband; zones stable at 21.6\u00b0C."
+  }
+]

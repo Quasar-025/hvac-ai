@@ -34,8 +34,29 @@ The core decision-making is handled by `EcoLoopAgent`, interfacing with local LL
     2. **Streaming Inference**: The agent streams its response (`stream=True`), capturing each token to give immediate UI feedback without waiting for the full response.
     3. **Rule-Based Fallback**: If inference exceeds the maximum allowed timestep latency or the model crashes, a fallback rule-based strategy instantly takes over, ensuring the building remains safe and the loop never blocks.
 - **Handling Lengthy Simulation Logs**: Traditional EnergyPlus integrations struggle with parsing massive, gigabyte-sized CSV or SQL output logs after the simulation completes. **Our technical approach bypasses this entirely.** By using PyEnergyPlus for True Runtime Injection, we only read the exact state variables we need directly from memory at the current timestep. We do not parse lengthy simulation logs; we stream the state incrementally, eliminating memory overhead and parsing bottlenecks.
+## 3. Self-Correction & Resilience
 
-## 3. MCP Server & Event Bus (`src/mcp_server.py`)
+The system implements a multi-layered self-correction chain to ensure the building is never left uncontrolled, even under LLM failures:
+
+1. **JSON Parsing Validation**: Every LLM response is parsed through `parse_llm_response()`, which strips markdown wrapping, extracts JSON, validates field presence and types, and rejects hallucinated out-of-range values (e.g., heating setpoints below 10°C or above 30°C).
+2. **3-Attempt Retry Loop**: If parsing fails, the agent re-prompts the LLM up to 3 times before falling back. Each failure is logged with diagnostic context.
+3. **Rule-Based Fallback**: If all 3 LLM attempts fail (or Ollama crashes entirely), a deterministic rule-based strategy takes over. It uses time-of-day and outdoor temperature to set sensible setpoints, ensuring the building remains safe and within comfort bounds.
+4. **Safety Clamping**: Even when the LLM succeeds, all setpoints are hardware-clamped in `apply_control_actions()` to the comfort range (19–26°C) with a minimum 1°C deadband. The AI physically cannot produce a dangerous setpoint.
+5. **Actuator Persistence**: The last valid AI action is cached and re-applied on every timestep. If the LLM call is skipped (due to the `ai_call_interval`), the cached action persists — EnergyPlus never reverts to default schedules unintentionally.
+
+This chain means the system degrades gracefully: LLM success → retry → fallback → safety clamp, with full observability at each stage via the SSE pipeline stream.
+
+## 4. Synthesized Metrics
+
+In addition to direct EnergyPlus sensor readings (zone temperatures, HVAC energy, occupancy, outdoor weather), the system synthesizes several additional metrics for richer LLM reasoning:
+
+- **Predicted Mean Vote (PMV)**: Approximated as `(zone_temp - 22.5) × 0.33`, providing a simplified Fanger-model comfort index. This is a linear approximation — a full PMV calculation would require radiant temperature, air velocity, and clothing/metabolic rate data not available in this IDF configuration.
+- **CO2 Concentration**: Estimated as `400 + (occupant_count × 25)` ppm, modeling baseline atmospheric CO2 plus per-occupant exhalation.  
+- **Grid Carbon Intensity**: Modeled with a duck-curve profile: 150 gCO₂/kWh during solar hours (10–15h), 450 during evening peak (17–21h), and 300 baseline otherwise. This enables the LLM to make carbon-aware load-shedding decisions.
+
+These approximations are clearly separated from true EnergyPlus outputs in the codebase (`energyplus_wrapper.py`, lines 287–328) and are sufficient for demonstrating the agent's multi-objective reasoning capabilities.
+
+## 5. MCP Server & Event Bus (`src/mcp_server.py`)
 
 The custom MCP server acts as the central nervous system, managing state and bridging the synchronous EnergyPlus thread with asynchronous Web clients.
 
@@ -44,7 +65,7 @@ The custom MCP server acts as the central nervous system, managing state and bri
 - **Live Metrics**: Calculates pro-rated energy savings and thermal comfort scores on the fly during the simulation, broadcasting them via SSE so the dashboard KPIs update in real-time.
 - **Event Flow**: As data flows through the system, the server emits a sequence of events (`pipeline:sensor` → `pipeline:llm_start` → `pipeline:llm_chunk` → `pipeline:llm_done` → `pipeline:injection` → `pipeline:metrics`).
 
-## 4. Next.js Digital Twin Dashboard (`web/`)
+## 6. Next.js Digital Twin Dashboard (`web/`)
 
 The frontend is built with **Next.js (App Router)** and features a premium "liquid glass" aesthetic using CSS custom variables and backdrop blurs.
 

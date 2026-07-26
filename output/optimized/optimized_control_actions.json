@@ -1,0 +1,746 @@
+[
+  {
+    "timestep": 24,
+    "heating_setpoint": 19.5,
+    "cooling_setpoint": 23.0,
+    "reasoning": "Unoccupied hours, saving energy and pre-cooling to prevent afternoon heat discomfort"
+  },
+  {
+    "timestep": 48,
+    "heating_setpoint": 19.5,
+    "cooling_setpoint": 24.1,
+    "reasoning": "Maintaining comfortable temperature and slightly relaxing cooling to reduce energy consumption."
+  },
+  {
+    "timestep": 72,
+    "heating_setpoint": 19.5,
+    "cooling_setpoint": 23.0,
+    "reasoning": "No carbon or PMV concerns; maintaining comfort and energy efficiency"
+  },
+  {
+    "timestep": 96,
+    "heating_setpoint": 19.5,
+    "cooling_setpoint": 25.5,
+    "reasoning": "Unoccupied hours, resting at extreme edges to save energy"
+  },
+  {
+    "timestep": 120,
+    "heating_setpoint": 19.5,
+    "cooling_setpoint": 25.5,
+    "reasoning": "Unoccupied hours; maintaining extreme edges of thermal comfort bounds."
+  },
+  {
+    "timestep": 144,
+    "heating_setpoint": 20.0,
+    "cooling_setpoint": 24.8,
+    "reasoning": "Occupied hours; CO2 > 1000 ppm, prioritizing comfort"
+  },
+  {
+    "timestep": 168,
+    "heating_setpoint": 19.5,
+    "cooling_setpoint": 25.5,
+    "reasoning": "Occupied and peak carbon; prioritizing comfort"
+  },
+  {
+    "timestep": 192,
+    "heating_setpoint": 19.5,
+    "cooling_setpoint": 25.5,
+    "reasoning": "Unoccupied hours, resting at extreme edges to save energy"
+  },
+  {
+    "timestep": 216,
+    "heating_setpoint": 19.5,
+    "cooling_setpoint": 25.5,
+    "reasoning": "Standard unoccupied period with low outdoor temperature and no comfort concerns"
+  },
+  {
+    "timestep": 240,
+    "heating_setpoint": 19.5,
+    "cooling_setpoint": 24.8,
+    "reasoning": "Occupied hour, prioritizing comfort; CO2 > 1000 ppm, narrowing deadband slightly"
+  },
+  {
+    "timestep": 264,
+    "heating_setpoint": 20.0,
+    "cooling_setpoint": 25.1,
+    "reasoning": "Occupied hours, maintaining comfort with slightly higher cooling to counterbalance PMV (0.72) and CO2 levels (660 ppm), while keeping within rigid thermal comfort bounds."
+  },
+  {
+    "timestep": 288,
+    "heating_setpoint": 19.5,
+    "cooling_setpoint": 25.5,
+    "reasoning": "Unoccupied hours, extreme edges for energy savings"
+  },
+  {
+    "timestep": 312,
+    "heating_setpoint": 19.5,
+    "cooling_setpoint": 25.5,
+    "reasoning": "Unoccupied hours, prioritizing energy savings"
+  },
+  {
+    "timestep": 336,
+    "heating_setpoint": 20.0,
+    "cooling_setpoint": 24.5,
+    "reasoning": "Comfort prioritized; PMV = 0.93; CO2 = 608 ppm"
+  },
+  {
+    "timestep": 360,
+    "heating_setpoint": 19.8,
+    "cooling_setpoint": 24.3,
+    "reasoning": "Pre-cooling due to high outdoor temperature and carbon intensity"
+  },
+  {
+    "timestep": 384,
+    "heating_setpoint": 19.5,
+    "cooling_setpoint": 25.5,
+    "reasoning": "Unoccupied hours; saving energy by resting at extreme edges"
+  },
+  {
+    "timestep": 408,
+    "heating_setpoint": 19.5,
+    "cooling_setpoint": 25.5,
+    "reasoning": "Unoccupied hours, maintaining extreme edges for energy savings"
+  },
+  {
+    "timestep": 432,
+    "heating_setpoint": 19.5,
+    "cooling_setpoint": 24.8,
+    "reasoning": "Hot outdoor conditions; prioritizing cooling to maintain comfort while minimizing energy consumption."
+  },
+  {
+    "timestep": 456,
+    "heating_setpoint": 21.0,
+    "cooling_setpoint": 25.3,
+    "reasoning": "Peak heat, outdoor temp high; pre-cooling in effect to prevent AC overload during afternoon peak; carbon-conscious setpoints"
+  },
+  {
+    "timestep": 480,
+    "heating_setpoint": 19.5,
+    "cooling_setpoint": 25.5,
+    "reasoning": "Unoccupied hours, saving energy by resting at the extreme edges of the bounds"
+  },
+  {
+    "timestep": 504,
+    "heating_setpoint": 19.5,
+    "cooling_setpoint": 25.5,
+    "reasoning": "Occupied hours; maintaining extreme edges for energy savings"
+  },
+  {
+    "timestep": 528,
+    "heating_setpoint": 20.0,
+    "cooling_setpoint": 24.5,
+    "reasoning": "Pre-cooling during heatwave with moderate setpoints to balance comfort and energy efficiency"
+  },
+  {
+    "timestep": 552,
+    "heating_setpoint": 19.8,
+    "cooling_setpoint": 25.1,
+    "reasoning": "Occupied hours with high outdoor temp and PMV > 1.0; prioritizing comfort while minimizing energy consumption"
+  },
+  {
+    "timestep": 576,
+    "heating_setpoint": 19.5,
+    "cooling_setpoint": 25.5,
+    "reasoning": "Unoccupied hours, saving energy by resting at extreme edges of comfort bounds"
+  },
+  {
+    "timestep": 600,
+    "heating_setpoint": 19.5,
+    "cooling_setpoint": 25.5,
+    "reasoning": "Occupied hours, outdoor temp within bounds, no PMV/CO2 issues"
+  },
+  {
+    "timestep": 624,
+    "heating_setpoint": 20.3,
+    "cooling_setpoint": 24.8,
+    "reasoning": "Pre-cooling to prevent afternoon discomfort and considering carbon footprint"
+  },
+  {
+    "timestep": 648,
+    "heating_setpoint": 21.4,
+    "cooling_setpoint": 25.0,
+    "reasoning": "Occupied hour, maintain comfort while considering carbon; CO2 level slightly high"
+  },
+  {
+    "timestep": 672,
+    "heating_setpoint": 19.5,
+    "cooling_setpoint": 25.5,
+    "reasoning": "Unoccupied hours; conserving energy by resting at the extreme edges of thermal comfort bounds"
+  },
+  {
+    "timestep": 696,
+    "heating_setpoint": 19.5,
+    "cooling_setpoint": 25.5,
+    "reasoning": "Occupied hours; maintaining strict thermal comfort bounds"
+  },
+  {
+    "timestep": 720,
+    "heating_setpoint": 20.0,
+    "cooling_setpoint": 24.5,
+    "reasoning": "Occupied and warm day; comfort priority with a slight deadband adjustment due to PMV > 1.0"
+  },
+  {
+    "timestep": 744,
+    "heating_setpoint": 21.0,
+    "cooling_setpoint": 24.0,
+    "reasoning": "Occupied, moderate occupancy, CO2 levels high (660 ppm), and PMV above neutral (0.64); prioritizing comfort, with a slight deadband adjustment"
+  },
+  {
+    "timestep": 768,
+    "heating_setpoint": 19.5,
+    "cooling_setpoint": 25.5,
+    "reasoning": "Unoccupied hours; saving energy at extreme edges"
+  },
+  {
+    "timestep": 792,
+    "heating_setpoint": 19.5,
+    "cooling_setpoint": 25.5,
+    "reasoning": "Unoccupied hours; maintaining extreme edges to save energy"
+  },
+  {
+    "timestep": 816,
+    "heating_setpoint": 20.5,
+    "cooling_setpoint": 24.0,
+    "reasoning": "Occupied period, adjusting to maintain comfort while reducing energy consumption."
+  },
+  {
+    "timestep": 840,
+    "heating_setpoint": 20.5,
+    "cooling_setpoint": 24.0,
+    "reasoning": "Occupied hours, no need to adjust setpoints"
+  },
+  {
+    "timestep": 864,
+    "heating_setpoint": 19.5,
+    "cooling_setpoint": 25.5,
+    "reasoning": "Unoccupied hours; saving energy at extreme edges"
+  },
+  {
+    "timestep": 888,
+    "heating_setpoint": 19.5,
+    "cooling_setpoint": 25.5,
+    "reasoning": "Occupied hours, normal operation"
+  },
+  {
+    "timestep": 912,
+    "heating_setpoint": 20.1,
+    "cooling_setpoint": 24.8,
+    "reasoning": "Maintain comfort and energy efficiency; slightly adjust setpoints to account for occupancy and air quality"
+  },
+  {
+    "timestep": 936,
+    "heating_setpoint": 21.5,
+    "cooling_setpoint": 24.5,
+    "reasoning": "Occupied, comfortable PMV, moderate CO2; no carbon concerns"
+  },
+  {
+    "timestep": 960,
+    "heating_setpoint": 19.5,
+    "cooling_setpoint": 25.5,
+    "reasoning": "Unoccupied hours; prioritizing energy savings"
+  },
+  {
+    "timestep": 984,
+    "heating_setpoint": 19.5,
+    "cooling_setpoint": 25.5,
+    "reasoning": "Unoccupied hours, no carbon concern, maintaining extreme bounds"
+  },
+  {
+    "timestep": 1008,
+    "heating_setpoint": 20.1,
+    "cooling_setpoint": 24.9,
+    "reasoning": "Maintaining comfort while adjusting for occupancy and air quality; considering carbon impact."
+  },
+  {
+    "timestep": 1032,
+    "heating_setpoint": 19.8,
+    "cooling_setpoint": 24.5,
+    "reasoning": "Occupied hours, maintaining comfort within bounds; slight cooling to compensate for high CO2 and PMV."
+  },
+  {
+    "timestep": 1056,
+    "heating_setpoint": 19.5,
+    "cooling_setpoint": 25.5,
+    "reasoning": "Unoccupied hours; extreme edges to save energy"
+  },
+  {
+    "timestep": 1080,
+    "heating_setpoint": 19.5,
+    "cooling_setpoint": 25.5,
+    "reasoning": "Occupied hours; maintaining current setpoints for thermal comfort"
+  },
+  {
+    "timestep": 1104,
+    "heating_setpoint": 20.0,
+    "cooling_setpoint": 24.5,
+    "reasoning": "Occupied during peak summer hours; adjusting setpoints to maintain thermal comfort and moderate energy consumption."
+  },
+  {
+    "timestep": 1128,
+    "heating_setpoint": 19.5,
+    "cooling_setpoint": 25.5,
+    "reasoning": "Occupied, pre-cooling for peak afternoon heat, grid carbon high"
+  },
+  {
+    "timestep": 1152,
+    "heating_setpoint": 19.5,
+    "cooling_setpoint": 25.5,
+    "reasoning": "Unoccupied hours, extreme edges of bounds to save energy"
+  },
+  {
+    "timestep": 1176,
+    "heating_setpoint": 19.5,
+    "cooling_setpoint": 25.5,
+    "reasoning": "Occupied hours; maintaining comfort within bounds"
+  },
+  {
+    "timestep": 1200,
+    "heating_setpoint": 19.5,
+    "cooling_setpoint": 23.0,
+    "reasoning": "Pre-cooling to prevent AC overload during afternoon peak heat; carbon intensity is low."
+  },
+  {
+    "timestep": 1224,
+    "heating_setpoint": 19.5,
+    "cooling_setpoint": 24.4,
+    "reasoning": "Pre-cooling to prevent afternoon peak heat; considering carbon footprint (450 gCO2/kWh)"
+  },
+  {
+    "timestep": 1248,
+    "heating_setpoint": 19.5,
+    "cooling_setpoint": 25.5,
+    "reasoning": "Unoccupied hours, conserving energy at extreme edges"
+  },
+  {
+    "timestep": 1272,
+    "heating_setpoint": 19.5,
+    "cooling_setpoint": 25.5,
+    "reasoning": "Unoccupied hours; maintaining extreme edges of thermal comfort range"
+  },
+  {
+    "timestep": 1296,
+    "heating_setpoint": 20.0,
+    "cooling_setpoint": 24.8,
+    "reasoning": "Occupied, comfortable PMV (0.92), moderate CO2 (608 ppm); adjusting to balance comfort and energy while staying within thermal bounds"
+  },
+  {
+    "timestep": 1320,
+    "heating_setpoint": 20.5,
+    "cooling_setpoint": 25.1,
+    "reasoning": "Occupied, maintaining comfort with moderate cooling, considering carbon (450gCO2/kWh)"
+  },
+  {
+    "timestep": 1344,
+    "heating_setpoint": 19.5,
+    "cooling_setpoint": 25.5,
+    "reasoning": "Unoccupied hours; saving energy by resting at extreme edges"
+  },
+  {
+    "timestep": 1368,
+    "heating_setpoint": 19.5,
+    "cooling_setpoint": 25.5,
+    "reasoning": "Unoccupied hours; maintaining extreme edges of comfort zone"
+  },
+  {
+    "timestep": 1392,
+    "heating_setpoint": 20.1,
+    "cooling_setpoint": 24.8,
+    "reasoning": "Optimizing for thermal comfort and carbon efficiency, considering occupied conditions and moderate outdoor temperature"
+  },
+  {
+    "timestep": 1416,
+    "heating_setpoint": 19.5,
+    "cooling_setpoint": 25.0,
+    "reasoning": "Pre-cooling for peak afternoon heat, prioritizing comfort and energy efficiency"
+  },
+  {
+    "timestep": 1440,
+    "heating_setpoint": 19.5,
+    "cooling_setpoint": 25.5,
+    "reasoning": "Unoccupied hours, extreme edge setpoints to save energy"
+  },
+  {
+    "timestep": 1464,
+    "heating_setpoint": 19.5,
+    "cooling_setpoint": 25.5,
+    "reasoning": "Occupied hours with comfortable temperatures; maintaining current settings"
+  },
+  {
+    "timestep": 1488,
+    "heating_setpoint": 20.0,
+    "cooling_setpoint": 24.5,
+    "reasoning": "Occupied with high PMV; prioritizing comfort"
+  },
+  {
+    "timestep": 1512,
+    "heating_setpoint": 19.5,
+    "cooling_setpoint": 25.5,
+    "reasoning": "Peak demand & carbon (Grid Intensity > 300 gCO2/kWh), prioritizing comfort"
+  },
+  {
+    "timestep": 1536,
+    "heating_setpoint": 19.5,
+    "cooling_setpoint": 25.5,
+    "reasoning": "Unoccupied hours; maintaining extreme edges to save energy"
+  },
+  {
+    "timestep": 1560,
+    "heating_setpoint": 19.5,
+    "cooling_setpoint": 25.5,
+    "reasoning": "Unoccupied hours; maintaining strict comfort bounds"
+  },
+  {
+    "timestep": 1584,
+    "heating_setpoint": 20.3,
+    "cooling_setpoint": 24.8,
+    "reasoning": "Optimize for comfort considering indoor CO2 and PMV levels; moderate cooling to reduce energy consumption."
+  },
+  {
+    "timestep": 1608,
+    "heating_setpoint": 21.5,
+    "cooling_setpoint": 25.1,
+    "reasoning": "Optimal comfort with slight cooling bias due to high occupancy and PMV, also considering the warm outdoor temperature and moderate CO2 levels; no carbon savings needed as grid intensity is normal."
+  },
+  {
+    "timestep": 1632,
+    "heating_setpoint": 19.5,
+    "cooling_setpoint": 25.5,
+    "reasoning": "Unoccupied hours; prioritizing energy savings"
+  },
+  {
+    "timestep": 1656,
+    "heating_setpoint": 19.5,
+    "cooling_setpoint": 24.8,
+    "reasoning": "Unoccupied hours; maintain thermal comfort at extreme edges (htg=19.5, clg=25.5)"
+  },
+  {
+    "timestep": 1680,
+    "heating_setpoint": 20.2,
+    "cooling_setpoint": 24.9,
+    "reasoning": "Occupied, outdoor temp high, and CO2 levels moderate; adjusting to maintain comfort while minimizing energy consumption."
+  },
+  {
+    "timestep": 1704,
+    "heating_setpoint": 21.1,
+    "cooling_setpoint": 24.3,
+    "reasoning": "Maintaining comfort (PMV<1) and narrowing deadband due to high CO2 levels (>1000 ppm), while considering moderate outdoor temperature."
+  },
+  {
+    "timestep": 1728,
+    "heating_setpoint": 19.5,
+    "cooling_setpoint": 25.5,
+    "reasoning": "Unoccupied hours; saving energy by resting at extreme edges"
+  },
+  {
+    "timestep": 1752,
+    "heating_setpoint": 19.5,
+    "cooling_setpoint": 25.5,
+    "reasoning": "Unoccupied hours; maintaining extreme edges to save energy"
+  },
+  {
+    "timestep": 1776,
+    "heating_setpoint": 20.2,
+    "cooling_setpoint": 24.8,
+    "reasoning": "Occupied during heatwave; prioritizing comfort while avoiding extreme temperatures"
+  },
+  {
+    "timestep": 1800,
+    "heating_setpoint": 19.5,
+    "cooling_setpoint": 25.0,
+    "reasoning": "Pre-cooling for peak heat tomorrow; high outdoor temp and PMV"
+  },
+  {
+    "timestep": 1824,
+    "heating_setpoint": 19.5,
+    "cooling_setpoint": 25.5,
+    "reasoning": "Unoccupied hours, saving energy at extreme edges"
+  },
+  {
+    "timestep": 1848,
+    "heating_setpoint": 19.5,
+    "cooling_setpoint": 25.5,
+    "reasoning": "OCCUPIED, pre-occupied hours, no PMV/CO2 concerns"
+  },
+  {
+    "timestep": 1872,
+    "heating_setpoint": 20.0,
+    "cooling_setpoint": 24.0,
+    "reasoning": "Pre-cooling due to high outdoor temperature and occupied hours"
+  },
+  {
+    "timestep": 1896,
+    "heating_setpoint": 21.5,
+    "cooling_setpoint": 25.0,
+    "reasoning": "Maintaining comfort during occupied hours; carbon intensity high (450 gCO2/kWh), shedding load with max cooling and min heating"
+  },
+  {
+    "timestep": 1920,
+    "heating_setpoint": 19.5,
+    "cooling_setpoint": 25.5,
+    "reasoning": "Unoccupied hours, prioritizing energy savings and extreme edges of the bounds."
+  },
+  {
+    "timestep": 1944,
+    "heating_setpoint": 19.5,
+    "cooling_setpoint": 25.4,
+    "reasoning": "Occupied hours; comfortable temperature range maintained; no carbon impact optimization"
+  },
+  {
+    "timestep": 1968,
+    "heating_setpoint": 20.1,
+    "cooling_setpoint": 24.9,
+    "reasoning": "Adjusting for occupied hours and moderate outdoor temperature; prioritizing comfort due to PMV>0.5"
+  },
+  {
+    "timestep": 1992,
+    "heating_setpoint": 20.5,
+    "cooling_setpoint": 25.0,
+    "reasoning": "Occupied, comfortable PMV (0.65), moderate CO2 levels; maintaining balance with some cooling and a slightly warmer heating setpoint"
+  },
+  {
+    "timestep": 2016,
+    "heating_setpoint": 19.5,
+    "cooling_setpoint": 25.5,
+    "reasoning": "Unoccupied hours, extreme edge of bounds to save energy"
+  },
+  {
+    "timestep": 2040,
+    "heating_setpoint": 19.5,
+    "cooling_setpoint": 25.5,
+    "reasoning": "Unoccupied hours, saving energy at extreme edges"
+  },
+  {
+    "timestep": 2064,
+    "heating_setpoint": 19.5,
+    "cooling_setpoint": 24.8,
+    "reasoning": "Occupied hours with high outdoor temp and indoor humidity; prioritizing comfort"
+  },
+  {
+    "timestep": 2088,
+    "heating_setpoint": 20.0,
+    "cooling_setpoint": 25.3,
+    "reasoning": "Maintaining comfort with PMV=0.74; adjusting for high CO2 levels and occupied hours"
+  },
+  {
+    "timestep": 2112,
+    "heating_setpoint": 19.5,
+    "cooling_setpoint": 25.5,
+    "reasoning": "Unoccupied hours, saving energy by resting at extreme edges"
+  },
+  {
+    "timestep": 2136,
+    "heating_setpoint": 19.5,
+    "cooling_setpoint": 25.5,
+    "reasoning": "Unoccupied hours, setting points at edges to save energy"
+  },
+  {
+    "timestep": 2160,
+    "heating_setpoint": 20.4,
+    "cooling_setpoint": 24.9,
+    "reasoning": "Occupied hours, maintaining comfort with slight narrowing due to high PMV and CO2 levels"
+  },
+  {
+    "timestep": 2184,
+    "heating_setpoint": 21.5,
+    "cooling_setpoint": 24.7,
+    "reasoning": "Pre-cooling to prevent afternoon discomfort; occupied hours require slight adjustments"
+  },
+  {
+    "timestep": 2208,
+    "heating_setpoint": 19.5,
+    "cooling_setpoint": 25.5,
+    "reasoning": "Unoccupied hours; extreme edges to save energy"
+  },
+  {
+    "timestep": 2232,
+    "heating_setpoint": 19.5,
+    "cooling_setpoint": 25.5,
+    "reasoning": "Unoccupied hours, maintaining extreme edges for energy savings"
+  },
+  {
+    "timestep": 2256,
+    "heating_setpoint": 20.0,
+    "cooling_setpoint": 24.5,
+    "reasoning": "Occupied during peak heat; targeting comfortable PMV while minimizing carbon impact"
+  },
+  {
+    "timestep": 2280,
+    "heating_setpoint": 20.1,
+    "cooling_setpoint": 24.3,
+    "reasoning": "Occupied with moderate PMV (0.66) and CO2 levels; slightly increase cooling to maintain comfort"
+  },
+  {
+    "timestep": 2304,
+    "heating_setpoint": 19.5,
+    "cooling_setpoint": 25.5,
+    "reasoning": "Unoccupied hours, saving energy at extreme edges; maintaining thermal comfort"
+  },
+  {
+    "timestep": 2328,
+    "heating_setpoint": 19.5,
+    "cooling_setpoint": 25.5,
+    "reasoning": "Unoccupied hours, saving energy by resting at the extreme edges of the bounds."
+  },
+  {
+    "timestep": 2352,
+    "heating_setpoint": 20.1,
+    "cooling_setpoint": 24.6,
+    "reasoning": "Maintaining comfort with slight adjustments; CO2 levels exceed standard"
+  },
+  {
+    "timestep": 2376,
+    "heating_setpoint": 20.5,
+    "cooling_setpoint": 24.8,
+    "reasoning": "Occupied hour with high PMV and CO2; slight comfort boost to mitigate thermal discomfort"
+  },
+  {
+    "timestep": 2400,
+    "heating_setpoint": 19.5,
+    "cooling_setpoint": 25.5,
+    "reasoning": "Unoccupied hours; prioritizing energy savings with traditional extreme edges"
+  },
+  {
+    "timestep": 2424,
+    "heating_setpoint": 19.5,
+    "cooling_setpoint": 24.5,
+    "reasoning": "Occupied hours; maintaining thermal comfort and not shedding load"
+  },
+  {
+    "timestep": 2448,
+    "heating_setpoint": 20.5,
+    "cooling_setpoint": 25.1,
+    "reasoning": "occupied hours; adjusting for comfort and grid carbon (150 gCO2/kWh)"
+  },
+  {
+    "timestep": 2472,
+    "heating_setpoint": 20.2,
+    "cooling_setpoint": 24.8,
+    "reasoning": "Comfort priority with moderate temperature to balance energy use and maintain thermal comfort"
+  },
+  {
+    "timestep": 2496,
+    "heating_setpoint": 19.5,
+    "cooling_setpoint": 25.5,
+    "reasoning": "Unoccupied hours, saving energy by resting at the extreme edges of the bounds"
+  },
+  {
+    "timestep": 2520,
+    "heating_setpoint": 19.5,
+    "cooling_setpoint": 25.5,
+    "reasoning": "Unoccupied hours; prioritizing energy savings"
+  },
+  {
+    "timestep": 2544,
+    "heating_setpoint": 21.5,
+    "cooling_setpoint": 24.5,
+    "reasoning": "Prevent comfort violations and maintain thermal comfort; also considering high outdoor temperature"
+  },
+  {
+    "timestep": 2568,
+    "heating_setpoint": 19.8,
+    "cooling_setpoint": 24.9,
+    "reasoning": "Pre-cooling to prevent afternoon peak heat, considering occupied hours and high outdoor temperature"
+  },
+  {
+    "timestep": 2592,
+    "heating_setpoint": 19.5,
+    "cooling_setpoint": 25.5,
+    "reasoning": "Unoccupied hours; extreme edges to save energy"
+  },
+  {
+    "timestep": 2616,
+    "heating_setpoint": 19.5,
+    "cooling_setpoint": 25.5,
+    "reasoning": "Unoccupied hours; maintaining extreme edges of the thermal comfort zone"
+  },
+  {
+    "timestep": 2640,
+    "heating_setpoint": 19.5,
+    "cooling_setpoint": 24.8,
+    "reasoning": "Maintaining comfort with slight cooling reduction due to occupied hours and high PMV; carbon intensity is low"
+  },
+  {
+    "timestep": 2664,
+    "heating_setpoint": 19.5,
+    "cooling_setpoint": 25.0,
+    "reasoning": "Comfort priority with normal outdoor conditions; maintaining occupied hours' deadband."
+  },
+  {
+    "timestep": 2688,
+    "heating_setpoint": 19.5,
+    "cooling_setpoint": 25.5,
+    "reasoning": "Unoccupied hours; resting at extreme edges to save energy"
+  },
+  {
+    "timestep": 2712,
+    "heating_setpoint": 19.5,
+    "cooling_setpoint": 25.5,
+    "reasoning": "Unoccupied hours, saving energy"
+  },
+  {
+    "timestep": 2736,
+    "heating_setpoint": 20.0,
+    "cooling_setpoint": 24.8,
+    "reasoning": "Maintaining comfort with occupied hours, slight cooling boost for PMV and CO2"
+  },
+  {
+    "timestep": 2760,
+    "heating_setpoint": 20.5,
+    "cooling_setpoint": 24.5,
+    "reasoning": "Occupied hours, maintain comfort and avoid overheating; considering CO2 level"
+  },
+  {
+    "timestep": 2784,
+    "heating_setpoint": 19.5,
+    "cooling_setpoint": 25.5,
+    "reasoning": "Unoccupied hours, saving energy by resting at the extreme edges of thermal comfort bounds."
+  },
+  {
+    "timestep": 2808,
+    "heating_setpoint": 19.5,
+    "cooling_setpoint": 25.5,
+    "reasoning": "Occupied hours, maintaining thermal comfort and energy efficiency"
+  },
+  {
+    "timestep": 2832,
+    "heating_setpoint": 20.5,
+    "cooling_setpoint": 24.8,
+    "reasoning": "Pre-cooling to prevent afternoon discomfort, prioritizing carbon efficiency (150 gCO2/kWh)"
+  },
+  {
+    "timestep": 2856,
+    "heating_setpoint": 21.0,
+    "cooling_setpoint": 24.0,
+    "reasoning": "Occupied, high outdoor temp; prioritizing comfort and energy efficiency"
+  },
+  {
+    "timestep": 2880,
+    "heating_setpoint": 19.5,
+    "cooling_setpoint": 25.5,
+    "reasoning": "Unoccupied hours; saving energy by resting at extreme edges of thermal comfort bounds."
+  },
+  {
+    "timestep": 2904,
+    "heating_setpoint": 19.5,
+    "cooling_setpoint": 25.5,
+    "reasoning": "Occupied hours; standard setpoints"
+  },
+  {
+    "timestep": 2928,
+    "heating_setpoint": 20.0,
+    "cooling_setpoint": 24.8,
+    "reasoning": "Occupied and hot, maintaining comfort with moderate cooling while minimizing carbon impact (150g CO2/kWh)"
+  },
+  {
+    "timestep": 2952,
+    "heating_setpoint": 21.0,
+    "cooling_setpoint": 24.5,
+    "reasoning": "Optimize for comfort while keeping in bounds; CO2 slightly high, but not a concern"
+  },
+  {
+    "timestep": 2976,
+    "heating_setpoint": 19.5,
+    "cooling_setpoint": 25.5,
+    "reasoning": "Unoccupied hours, extreme setback for energy savings"
+  }
+]
