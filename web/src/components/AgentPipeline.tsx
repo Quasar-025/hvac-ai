@@ -1,113 +1,252 @@
 "use client";
 
-import { useState, useEffect } from 'react';
-import { Cpu, Server, Activity, ArrowRight, Zap, Database } from 'lucide-react';
+import { useSSE } from './SSEProvider';
+import { Database, Cpu, Zap, ChevronRight, Wifi, WifiOff, Loader2 } from 'lucide-react';
 
-interface AgentPipelineProps {
-  latestData: any;
-  latestAction: any;
+function FlowArrow({ active, color }: { active: boolean; color: string }) {
+  return (
+    <div className="flex lg:flex-col items-center justify-center py-3 lg:py-0 lg:px-3 shrink-0">
+      <div className="flex items-center gap-1">
+        {[0, 1, 2].map(i => (
+          <div
+            key={i}
+            className="w-2 h-2 rounded-full transition-all duration-300"
+            style={{
+              background: active ? color : 'var(--text-muted)',
+              opacity: active ? 1 : 0.25,
+              animationDelay: `${i * 0.2}s`,
+              animation: active ? `flow-particle 1.2s ease-in-out ${i * 0.2}s infinite` : 'none',
+            }}
+          />
+        ))}
+        <ChevronRight
+          size={18}
+          className="hidden lg:block transition-colors duration-300"
+          style={{ color: active ? color : 'var(--text-muted)', opacity: active ? 1 : 0.3 }}
+        />
+        {/* Vertical arrow for mobile */}
+        <div
+          className="lg:hidden w-0.5 h-6 rounded transition-colors duration-300"
+          style={{ background: active ? color : 'var(--text-muted)', opacity: active ? 1 : 0.3 }}
+        />
+      </div>
+    </div>
+  );
 }
 
-export default function AgentPipeline({ latestData, latestAction }: AgentPipelineProps) {
-  // Simple animation states
-  const [pulse, setPulse] = useState(false);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setPulse(p => !p);
-    }, 2000);
-    return () => clearInterval(interval);
-  }, []);
-
-  const safeData = latestData || {};
-  const safeAction = latestAction || {};
+function StatusBadge({ phase, targetPhase, label }: { phase: string; targetPhase: string; label: string }) {
+  const isActive = phase === targetPhase;
+  const isPast = (
+    (targetPhase === 'sensing' && ['thinking', 'injecting'].includes(phase)) ||
+    (targetPhase === 'thinking' && phase === 'injecting')
+  );
 
   return (
-    <div className="w-full min-h-[500px] flex flex-col items-center justify-center p-8 bg-slate-900/40 backdrop-blur-md border border-slate-700/50 rounded-2xl shadow-xl mt-6">
-      <div className="text-center mb-12">
-        <h2 className="text-2xl font-bold text-white tracking-tight">Closed-Loop Execution Framework</h2>
-        <p className="text-slate-400 mt-2">True Runtime Forward-Injection Pipeline</p>
+    <span
+      className="text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full transition-all duration-300"
+      style={{
+        background: isActive ? 'var(--accent-primary-dim)' : isPast ? 'var(--accent-secondary-dim)' : 'transparent',
+        color: isActive ? 'var(--accent-primary)' : isPast ? 'var(--accent-secondary)' : 'var(--text-muted)',
+        border: `1px solid ${isActive ? 'var(--accent-primary)' : 'transparent'}`,
+      }}
+    >
+      {isActive ? '● ' : isPast ? '✓ ' : ''}{label}
+    </span>
+  );
+}
+
+export default function AgentPipeline() {
+  const { phase, sensorData, llmTokens, llmStartInfo, llmDoneInfo, injectionData, connected, timestepCount } = useSSE();
+
+  return (
+    <div className="w-full min-h-[520px] flex flex-col p-6 lg:p-8 glass-card mt-6">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-8">
+        <div>
+          <h2 className="text-xl font-bold" style={{ color: 'var(--text-primary)' }}>
+            Closed-Loop Execution Framework
+          </h2>
+          <p className="text-sm mt-1" style={{ color: 'var(--text-tertiary)' }}>
+            True Runtime Forward-Injection Pipeline
+          </p>
+        </div>
+        <div className="flex items-center gap-3">
+          <span className="text-xs font-mono" style={{ color: 'var(--text-muted)' }}>
+            TS #{timestepCount}
+          </span>
+          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full" style={{
+            background: connected ? 'var(--accent-secondary-dim)' : 'rgba(248,113,113,0.12)',
+            border: `1px solid ${connected ? 'var(--accent-secondary)' : 'var(--accent-danger)'}30`,
+          }}>
+            {connected ? (
+              <Wifi size={12} style={{ color: 'var(--accent-secondary)' }} />
+            ) : (
+              <WifiOff size={12} style={{ color: 'var(--accent-danger)' }} />
+            )}
+            <span className="text-xs font-medium" style={{ color: connected ? 'var(--accent-secondary)' : 'var(--accent-danger)' }}>
+              {connected ? 'Stream Live' : 'Reconnecting...'}
+            </span>
+          </div>
+        </div>
       </div>
 
-      <div className="flex flex-col lg:flex-row items-stretch justify-center w-full gap-4 max-w-6xl">
-        
-        {/* Node 1: EnergyPlus Engine */}
-        <div className="flex-1 bg-slate-800/80 border border-slate-600 rounded-xl p-6 relative overflow-hidden group hover:border-blue-500/50 transition-colors">
-          <div className="absolute top-0 left-0 w-full h-1 bg-blue-500"></div>
-          <div className="flex items-center gap-3 mb-4 text-blue-400">
-            <Database size={24} />
-            <h3 className="font-semibold text-lg text-white">EnergyPlus Physics Engine</h3>
-          </div>
-          <p className="text-xs text-slate-400 mb-4">Continuous PyEnergyPlus Simulation</p>
-          
-          <div className="bg-slate-950 p-4 rounded-lg font-mono text-xs text-blue-300 overflow-y-auto max-h-48 custom-scrollbar">
-            {'{'}
-            <div className="pl-4">
-              <span className="text-blue-400">"timestamp":</span> <span className="text-emerald-400">"{safeData.timestamp || 'N/A'}"</span>,<br/>
-              <span className="text-blue-400">"outdoor_temp":</span> <span className="text-emerald-400">{safeData.outdoor_temp_c || 0}</span>,<br/>
-              <span className="text-blue-400">"avg_co2_ppm":</span> <span className="text-emerald-400">{
-                safeData.zones ? 
-                Math.round(Object.values(safeData.zones).reduce((acc: any, z: any) => acc + (z.co2_ppm || 0), 0) / 5) : 400
-              }</span>,<br/>
-              <span className="text-blue-400">"grid_carbon_g_kwh":</span> <span className="text-emerald-400">{safeData.grid_carbon_intensity_g_kwh || 300}</span>,<br/>
-              <span className="text-slate-500">// ... 5-zone telemetry</span>
+      {/* Pipeline Nodes */}
+      <div className="flex flex-col lg:flex-row items-stretch justify-center w-full gap-0 flex-1 max-w-7xl mx-auto">
+
+        {/* ── Node 1: EnergyPlus Engine ── */}
+        <div className={`flex-1 glass-card pipeline-node sensor p-5 ${phase === 'sensing' ? 'active' : ''}`}>
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: 'var(--node-sensor-dim)' }}>
+                <Database size={16} style={{ color: 'var(--node-sensor)' }} />
+              </div>
+              <div>
+                <h3 className="font-semibold text-sm" style={{ color: 'var(--text-primary)' }}>EnergyPlus Engine</h3>
+                <p className="text-[10px]" style={{ color: 'var(--text-muted)' }}>PyEnergyPlus Runtime</p>
+              </div>
             </div>
-            {'}'}
+            <StatusBadge phase={phase} targetPhase="sensing" label="Sensor Read" />
+          </div>
+
+          {/* Accent bar */}
+          <div className="w-full h-[2px] rounded-full mb-3" style={{
+            background: phase === 'sensing'
+              ? `linear-gradient(90deg, var(--node-sensor), transparent)`
+              : 'var(--divider)',
+          }} />
+
+          <div className="code-surface p-3 text-xs overflow-y-auto max-h-44 custom-scrollbar" style={{ color: 'var(--node-sensor)' }}>
+            {sensorData ? (
+              <pre className="whitespace-pre-wrap font-mono leading-relaxed">
+                <span style={{ color: 'var(--text-muted)' }}>{'{\n'}</span>
+                <span>  <span style={{ color: 'var(--node-sensor)' }}>&quot;timestamp&quot;</span>: <span style={{ color: 'var(--accent-secondary)' }}>&quot;{sensorData.timestamp}&quot;</span>,</span>{'\n'}
+                <span>  <span style={{ color: 'var(--node-sensor)' }}>&quot;outdoor_temp&quot;</span>: <span style={{ color: 'var(--accent-secondary)' }}>{sensorData.outdoor_temp_c?.toFixed(1) ?? 'N/A'}</span>,</span>{'\n'}
+                <span>  <span style={{ color: 'var(--node-sensor)' }}>&quot;hvac_power_w&quot;</span>: <span style={{ color: 'var(--accent-secondary)' }}>{sensorData.hvac_power_w?.toFixed(0) ?? 0}</span>,</span>{'\n'}
+                <span>  <span style={{ color: 'var(--node-sensor)' }}>&quot;grid_carbon&quot;</span>: <span style={{ color: 'var(--accent-secondary)' }}>{sensorData.grid_carbon_intensity_g_kwh ?? 300}</span>,</span>{'\n'}
+                <span>  <span style={{ color: 'var(--node-sensor)' }}>&quot;zones&quot;</span>: <span style={{ color: 'var(--text-muted)' }}>{'{ '}{sensorData.zones ? Object.keys(sensorData.zones).length : 0}{' zones }'}</span></span>{'\n'}
+                <span style={{ color: 'var(--text-muted)' }}>{'}'}</span>
+              </pre>
+            ) : (
+              <div className="flex items-center justify-center h-24" style={{ color: 'var(--text-muted)' }}>
+                <span className="italic text-xs">Awaiting sensor data...</span>
+              </div>
+            )}
           </div>
         </div>
 
-        {/* Stream 1 */}
-        <div className="flex lg:flex-col items-center justify-center py-4 lg:py-0 lg:px-2">
-          <div className={`flex flex-col items-center text-emerald-500 transition-opacity duration-500 ${pulse ? 'opacity-100' : 'opacity-40'}`}>
-            <span className="text-[10px] font-bold uppercase tracking-widest mb-2 hidden lg:block text-slate-400">Feedback</span>
-            <ArrowRight size={32} className="hidden lg:block animate-pulse" />
-            <div className="w-1 h-8 lg:hidden bg-emerald-500 rounded animate-pulse"></div>
-          </div>
-        </div>
+        {/* Arrow 1 */}
+        <FlowArrow active={phase === 'sensing' || phase === 'thinking'} color="var(--node-sensor)" />
 
-        {/* Node 2: LLM Agent */}
-        <div className="flex-1 bg-slate-800/80 border border-slate-600 rounded-xl p-6 relative overflow-hidden group hover:border-emerald-500/50 transition-colors">
-          <div className="absolute top-0 left-0 w-full h-1 bg-emerald-500"></div>
-          <div className="flex items-center gap-3 mb-4 text-emerald-400">
-            <Cpu size={24} />
-            <h3 className="font-semibold text-lg text-white">Qwen 9B Agent</h3>
-          </div>
-          <p className="text-xs text-slate-400 mb-4">Reasoning against Comfort & Carbon Targets</p>
-          
-          <div className="bg-slate-950 p-4 rounded-lg text-xs text-slate-300 max-h-48 overflow-y-auto italic border-l-2 border-emerald-500">
-            "{safeAction.reasoning || "Analyzing zone thermal inertia and carbon grid signals to determine optimal ECM setpoints..."}"
-          </div>
-        </div>
-
-        {/* Stream 2 */}
-        <div className="flex lg:flex-col items-center justify-center py-4 lg:py-0 lg:px-2">
-          <div className={`flex flex-col items-center text-purple-500 transition-opacity duration-500 ${!pulse ? 'opacity-100' : 'opacity-40'}`}>
-            <span className="text-[10px] font-bold uppercase tracking-widest mb-2 hidden lg:block text-slate-400">Forward Injection</span>
-            <ArrowRight size={32} className="hidden lg:block animate-pulse" />
-            <div className="w-1 h-8 lg:hidden bg-purple-500 rounded animate-pulse"></div>
-          </div>
-        </div>
-
-        {/* Node 3: Actuator Setpoints */}
-        <div className="flex-1 bg-slate-800/80 border border-slate-600 rounded-xl p-6 relative overflow-hidden group hover:border-purple-500/50 transition-colors">
-          <div className="absolute top-0 left-0 w-full h-1 bg-purple-500"></div>
-          <div className="flex items-center gap-3 mb-4 text-purple-400">
-            <Zap size={24} />
-            <h3 className="font-semibold text-lg text-white">Runtime Injector</h3>
-          </div>
-          <p className="text-xs text-slate-400 mb-4">Dynamic Setpoint Memory Injection</p>
-          
-          <div className="bg-slate-950 p-4 rounded-lg font-mono text-xs text-purple-300 overflow-y-auto max-h-48">
-            {'{'}
-            <div className="pl-4">
-              <span className="text-purple-400">"action":</span> <span className="text-emerald-400">"SETPOINT_OVERRIDE"</span>,<br/>
-              <span className="text-purple-400">"heating_c":</span> <span className="text-emerald-400">{safeAction.htg_setpoint_c || 22.2}</span>,<br/>
-              <span className="text-purple-400">"cooling_c":</span> <span className="text-emerald-400">{safeAction.clg_setpoint_c || 23.9}</span><br/>
+        {/* ── Node 2: LLM Agent ── */}
+        <div className={`flex-1 glass-card pipeline-node llm p-5 ${phase === 'thinking' ? 'active' : ''}`}>
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{
+                background: 'var(--node-llm-dim)',
+                ...(phase === 'thinking' ? { animation: 'glow-ring 2s ease-in-out infinite' } : {}),
+              }}>
+                {phase === 'thinking' ? (
+                  <Loader2 size={16} className="animate-spin-slow" style={{ color: 'var(--node-llm)' }} />
+                ) : (
+                  <Cpu size={16} style={{ color: 'var(--node-llm)' }} />
+                )}
+              </div>
+              <div>
+                <h3 className="font-semibold text-sm" style={{ color: 'var(--text-primary)' }}>Qwen 9B Agent</h3>
+                <p className="text-[10px]" style={{ color: 'var(--text-muted)' }}>
+                  {llmStartInfo?.model || 'Comfort & Carbon Optimizer'}
+                </p>
+              </div>
             </div>
-            {'}'}
+            <StatusBadge phase={phase} targetPhase="thinking" label={phase === 'thinking' ? 'Reasoning' : 'LLM'} />
+          </div>
+
+          {/* Accent bar */}
+          <div className="w-full h-[2px] rounded-full mb-3" style={{
+            background: phase === 'thinking'
+              ? `linear-gradient(90deg, var(--node-llm), transparent)`
+              : 'var(--divider)',
+            ...(phase === 'thinking' ? {
+              backgroundImage: 'linear-gradient(90deg, transparent, var(--node-llm-dim), var(--node-llm), var(--node-llm-dim), transparent)',
+              backgroundSize: '200% 100%',
+              animation: 'shimmer 1.5s linear infinite',
+            } : {}),
+          }} />
+
+          <div className="code-surface p-3 text-xs overflow-y-auto max-h-44 custom-scrollbar relative" style={{ color: 'var(--node-llm)' }}>
+            {phase === 'thinking' && llmTokens ? (
+              <div className="font-mono leading-relaxed whitespace-pre-wrap">
+                <span style={{ color: 'var(--text-secondary)' }}>{llmTokens}</span>
+                <span className="animate-cursor-blink inline-block w-[2px] h-3.5 ml-0.5 align-middle" style={{ background: 'var(--node-llm)' }} />
+              </div>
+            ) : phase === 'thinking' && !llmTokens ? (
+              <div className="flex items-center gap-2 justify-center h-24">
+                <Loader2 size={14} className="animate-spin" style={{ color: 'var(--node-llm)' }} />
+                <span className="italic" style={{ color: 'var(--text-muted)' }}>Analyzing zone telemetry...</span>
+              </div>
+            ) : llmDoneInfo?.actions ? (
+              <pre className="whitespace-pre-wrap font-mono leading-relaxed">
+                <span style={{ color: 'var(--text-muted)' }}>{'{\n'}</span>
+                <span>  <span style={{ color: 'var(--node-llm)' }}>&quot;heating_setpoint&quot;</span>: <span style={{ color: 'var(--accent-secondary)' }}>{llmDoneInfo.actions.heating_setpoint}</span>,</span>{'\n'}
+                <span>  <span style={{ color: 'var(--node-llm)' }}>&quot;cooling_setpoint&quot;</span>: <span style={{ color: 'var(--accent-secondary)' }}>{llmDoneInfo.actions.cooling_setpoint}</span>,</span>{'\n'}
+                <span>  <span style={{ color: 'var(--node-llm)' }}>&quot;reasoning&quot;</span>: <span style={{ color: 'var(--accent-warning)' }}>&quot;{llmDoneInfo.actions.reasoning?.slice(0, 120) ?? ''}...&quot;</span></span>{'\n'}
+                <span style={{ color: 'var(--text-muted)' }}>{'}'}</span>
+                {llmDoneInfo.latency_s && (
+                  <span className="block mt-2" style={{ color: 'var(--text-muted)' }}>
+                    {llmDoneInfo.fallback ? '⚡ Fallback' : '✓ Parsed'} in {llmDoneInfo.latency_s}s
+                  </span>
+                )}
+              </pre>
+            ) : (
+              <div className="flex items-center justify-center h-24" style={{ color: 'var(--text-muted)' }}>
+                <span className="italic text-xs">Awaiting LLM inference...</span>
+              </div>
+            )}
           </div>
         </div>
 
+        {/* Arrow 2 */}
+        <FlowArrow active={phase === 'injecting'} color="var(--node-inject)" />
+
+        {/* ── Node 3: Runtime Injector ── */}
+        <div className={`flex-1 glass-card pipeline-node inject p-5 ${phase === 'injecting' ? 'active' : ''}`}>
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: 'var(--node-inject-dim)' }}>
+                <Zap size={16} style={{ color: 'var(--node-inject)' }} />
+              </div>
+              <div>
+                <h3 className="font-semibold text-sm" style={{ color: 'var(--text-primary)' }}>Runtime Injector</h3>
+                <p className="text-[10px]" style={{ color: 'var(--text-muted)' }}>Memory Setpoint Override</p>
+              </div>
+            </div>
+            <StatusBadge phase={phase} targetPhase="injecting" label="Injecting" />
+          </div>
+
+          {/* Accent bar */}
+          <div className="w-full h-[2px] rounded-full mb-3" style={{
+            background: phase === 'injecting'
+              ? `linear-gradient(90deg, var(--node-inject), transparent)`
+              : 'var(--divider)',
+          }} />
+
+          <div className="code-surface p-3 text-xs overflow-y-auto max-h-44 custom-scrollbar" style={{ color: 'var(--node-inject)' }}>
+            {injectionData ? (
+              <pre className="whitespace-pre-wrap font-mono leading-relaxed animate-fade-in">
+                <span style={{ color: 'var(--text-muted)' }}>{'{\n'}</span>
+                <span>  <span style={{ color: 'var(--node-inject)' }}>&quot;action&quot;</span>: <span style={{ color: 'var(--accent-secondary)' }}>&quot;SETPOINT_OVERRIDE&quot;</span>,</span>{'\n'}
+                <span>  <span style={{ color: 'var(--node-inject)' }}>&quot;heating_c&quot;</span>: <span style={{ color: 'var(--accent-secondary)' }}>{injectionData.heating_setpoint ?? '—'}</span>,</span>{'\n'}
+                <span>  <span style={{ color: 'var(--node-inject)' }}>&quot;cooling_c&quot;</span>: <span style={{ color: 'var(--accent-secondary)' }}>{injectionData.cooling_setpoint ?? '—'}</span>,</span>{'\n'}
+                <span>  <span style={{ color: 'var(--node-inject)' }}>&quot;reasoning&quot;</span>: <span style={{ color: 'var(--accent-warning)' }}>&quot;{injectionData.reasoning?.slice(0, 80) ?? ''}...&quot;</span></span>{'\n'}
+                <span style={{ color: 'var(--text-muted)' }}>{'}'}</span>
+              </pre>
+            ) : (
+              <div className="flex items-center justify-center h-24" style={{ color: 'var(--text-muted)' }}>
+                <span className="italic text-xs">Awaiting injection command...</span>
+              </div>
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );

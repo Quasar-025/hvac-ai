@@ -46,6 +46,8 @@ Thumbs.db
 desktop.ini
 
 # Project
-data/results.json
+data/
+output/
 test.py
 *.log
+debug_llm.txt

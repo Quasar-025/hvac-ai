@@ -7,15 +7,18 @@ import EnergyChart from '@/components/EnergyChart';
 import TempChart from '@/components/TempChart';
 import LogViewer from '@/components/LogViewer';
 import AgentPipeline from '@/components/AgentPipeline';
+import ThemeToggle from '@/components/ThemeToggle';
+import { SSEProvider, useSSE } from '@/components/SSEProvider';
 import { Leaf, Activity, BarChart2 } from 'lucide-react';
 
-export default function Dashboard() {
+function DashboardContent() {
   const [viewMode, setViewMode] = useState<'dashboard' | 'pipeline'>('dashboard');
   const [results, setResults] = useState<any>(null);
   const [baseData, setBaseData] = useState<any[]>([]);
   const [optData, setOptData] = useState<any[]>([]);
   const [actions, setActions] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const sse = useSSE();
 
   const fetchData = async () => {
     try {
@@ -47,58 +50,89 @@ export default function Dashboard() {
   }, []);
 
   return (
-    <main className="min-h-screen bg-slate-950 text-slate-200 font-sans selection:bg-emerald-500/30">
-      {/* Dynamic Background */}
-      <div className="fixed inset-0 z-0 pointer-events-none">
-        <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] rounded-full bg-emerald-600/10 blur-[120px]" />
-        <div className="absolute bottom-[-20%] right-[-10%] w-[50%] h-[50%] rounded-full bg-blue-600/10 blur-[120px]" />
-      </div>
+    <main className="min-h-screen font-sans" style={{ background: 'var(--bg-primary)', color: 'var(--text-primary)' }}>
+      {/* Ambient Background */}
+      <div className="ambient-bg" />
 
       <div className="relative z-10 mx-auto px-6 lg:px-8 py-8 w-full max-w-[1800px]">
         {/* Header */}
         <header className="flex items-center justify-between mb-10">
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-400 to-blue-500 flex items-center justify-center shadow-[0_0_20px_rgba(16,185,129,0.3)]">
+            <div
+              className="w-12 h-12 rounded-xl flex items-center justify-center"
+              style={{
+                background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))',
+                boxShadow: '0 0 24px var(--accent-primary-dim)',
+              }}
+            >
               <Leaf className="text-white" size={24} />
             </div>
             <div>
-              <h1 className="text-2xl font-bold tracking-tight text-white">Eco-Loop <span className="text-emerald-400 font-light">Agents</span></h1>
-              <p className="text-slate-400 text-sm">Autonomous Building Energy Optimization</p>
+              <h1 className="text-2xl font-bold tracking-tight" style={{ color: 'var(--text-primary)' }}>
+                Eco-Loop <span style={{ color: 'var(--accent-primary)', fontWeight: 300 }}>Agents</span>
+              </h1>
+              <p className="text-sm" style={{ color: 'var(--text-tertiary)' }}>
+                Autonomous Building Energy Optimization
+              </p>
             </div>
           </div>
           
           <div className="flex items-center gap-4">
-            <div className="flex bg-slate-900/50 p-1 rounded-lg border border-slate-700/50">
+            {/* View Mode Toggle */}
+            <div className="flex p-1 rounded-xl glass-surface">
               <button 
                 onClick={() => setViewMode('dashboard')}
-                className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${viewMode === 'dashboard' ? 'bg-emerald-500/20 text-emerald-400' : 'text-slate-400 hover:text-slate-200'}`}
+                className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-200"
+                style={{
+                  background: viewMode === 'dashboard' ? 'var(--accent-primary-dim)' : 'transparent',
+                  color: viewMode === 'dashboard' ? 'var(--accent-primary)' : 'var(--text-tertiary)',
+                }}
               >
                 <BarChart2 size={16} /> Analytics
               </button>
               <button 
                 onClick={() => setViewMode('pipeline')}
-                className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${viewMode === 'pipeline' ? 'bg-purple-500/20 text-purple-400' : 'text-slate-400 hover:text-slate-200'}`}
+                className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-200"
+                style={{
+                  background: viewMode === 'pipeline' ? 'var(--accent-tertiary-dim)' : 'transparent',
+                  color: viewMode === 'pipeline' ? 'var(--accent-tertiary)' : 'var(--text-tertiary)',
+                }}
               >
                 <Activity size={16} /> Pipeline
               </button>
             </div>
+
+            {/* Theme Toggle */}
+            <ThemeToggle />
             
-            <div className="flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/20 px-4 py-2 rounded-full">
-              <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
-              <span className="text-sm font-medium text-emerald-400">AI Active</span>
+            {/* Status Badge */}
+            <div
+              className="flex items-center gap-2 px-4 py-2 rounded-full"
+              style={{
+                background: sse.connected ? 'var(--accent-secondary-dim)' : 'var(--accent-primary-dim)',
+                border: `1px solid ${sse.connected ? 'var(--accent-secondary)' : 'var(--accent-primary)'}20`,
+              }}
+            >
+              <div
+                className="w-2 h-2 rounded-full animate-pulse"
+                style={{ background: sse.connected ? 'var(--accent-secondary)' : 'var(--accent-primary)' }}
+              />
+              <span className="text-sm font-medium" style={{ color: sse.connected ? 'var(--accent-secondary)' : 'var(--accent-primary)' }}>
+                {sse.connected ? 'AI Live' : 'AI Active'}
+              </span>
             </div>
           </div>
         </header>
 
         {loading ? (
-          <div className="flex items-center justify-center h-64 text-slate-400">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-500 mr-3"></div>
+          <div className="flex items-center justify-center h-64" style={{ color: 'var(--text-tertiary)' }}>
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 mr-3" style={{ borderColor: 'var(--accent-primary)' }} />
             Loading simulation data...
           </div>
         ) : (
           <>
-            {/* KPI Section */}
-            <KPIBoard results={results} />
+            {/* KPI Section — use live SSE metrics during simulation, file-based results after */}
+            <KPIBoard results={results || sse.liveMetrics} />
 
             {/* Conditional Views */}
             {viewMode === 'dashboard' ? (
@@ -106,13 +140,17 @@ export default function Dashboard() {
                 
                 {/* Left Column - Charts */}
                 <div className="lg:col-span-2 space-y-6">
-                  <div className="bg-slate-900/40 backdrop-blur-md border border-slate-700/50 rounded-2xl p-6 shadow-xl">
-                    <h2 className="text-lg font-semibold text-slate-200 mb-4">Energy Profile (Baseline vs AI)</h2>
+                  <div className="glass-card p-6">
+                    <h2 className="text-lg font-semibold mb-4" style={{ color: 'var(--text-primary)' }}>
+                      Energy Profile (Baseline vs AI)
+                    </h2>
                     <EnergyChart baseData={baseData} optData={optData} />
                   </div>
                   
-                  <div className="bg-slate-900/40 backdrop-blur-md border border-slate-700/50 rounded-2xl p-6 shadow-xl">
-                    <h2 className="text-lg font-semibold text-slate-200 mb-4">Zone Temperatures & AI Setpoints</h2>
+                  <div className="glass-card p-6">
+                    <h2 className="text-lg font-semibold mb-4" style={{ color: 'var(--text-primary)' }}>
+                      Zone Temperatures & AI Setpoints
+                    </h2>
                     <TempChart optData={optData} />
                   </div>
                 </div>
@@ -124,14 +162,19 @@ export default function Dashboard() {
                 </div>
               </div>
             ) : (
-              <AgentPipeline 
-                latestData={optData[optData.length - 1]} 
-                latestAction={actions[actions.length - 1]} 
-              />
+              <AgentPipeline />
             )}
           </>
         )}
       </div>
     </main>
+  );
+}
+
+export default function Dashboard() {
+  return (
+    <SSEProvider>
+      <DashboardContent />
+    </SSEProvider>
   );
 }
