@@ -249,6 +249,14 @@ class EnergyPlusWrapper:
         day = self.api.exchange.day_of_month(state)
         hour = self.api.exchange.hour(state)
         minute = self.api.exchange.minutes(state)
+        
+        # EnergyPlus represents the end of the hour as minute=60
+        if minute == 60:
+            hour += 1
+            minute = 0
+            if hour == 24:
+                hour = 0
+                
         warmup = self.api.exchange.warmup_flag(state)
         
         if warmup:
