@@ -227,44 +227,43 @@ class EcoLoopAgent:
         
         start = time.time()
         
-        try:
-            # Call Ollama
-            response = ollama.chat(
-                model=self.model,
-                format="json",
-                options={"num_ctx": 4096},
-                messages=[
-                    {"role": "system", "content": self.system_prompt},
-                    {"role": "user", "content": user_prompt}
-                ]
-            )
-            
-            latency = time.time() - start
-            self.total_latency += latency
-            
-            response_text = response["message"]["content"]
-            
-            if self.verbose:
-                print(f"[AGENT] Response ({latency:.1f}s): {response_text}")
-            
-            # Parse and validate
-            actions = parse_llm_response(response_text)
-            
-            if actions:
-                self.success_count += 1
-                if self.verbose:
-                    print(f"[AGENT] Actions: htg={actions['heating_setpoint']}°C, "
-                          f"clg={actions['cooling_setpoint']}°C")
-                return actions
-            else:
-                if self.verbose:
-                    print(f"[AGENT] Failed to parse response, using fallback")
+        for attempt in range(3):
+            try:
+                # Call Ollama
+                response = ollama.chat(
+                    model=self.model,
+                    format="json",
+                    options={"num_ctx": 4096},
+                    messages=[
+                        {"role": "system", "content": self.system_prompt},
+                        {"role": "user", "content": user_prompt}
+                    ]
+                )
                 
-        except Exception as e:
-            latency = time.time() - start
-            self.total_latency += latency
-            if self.verbose:
-                print(f"[AGENT] LLM error ({latency:.1f}s): {e}")
+                latency = time.time() - start
+                self.total_latency += latency
+                
+                response_text = response["message"]["content"]
+                
+                if self.verbose:
+                    print(f"[AGENT] Response ({latency:.1f}s): {response_text}")
+                
+                # Parse and validate
+                actions = parse_llm_response(response_text)
+                
+                if actions:
+                    self.success_count += 1
+                    if self.verbose:
+                        print(f"[AGENT] Actions: htg={actions['heating_setpoint']}°C, "
+                              f"clg={actions['cooling_setpoint']}°C")
+                    return actions
+                else:
+                    print(f"[WARN] Failed to parse response, attempt {attempt + 1}/3")
+                    
+            except Exception as e:
+                latency = time.time() - start
+                print(f"[ERROR] LLM error ({latency:.1f}s): {e}")
+                time.sleep(2)  # Wait before retrying
         
         # Fallback: rule-based strategy
         self.fallback_count += 1
