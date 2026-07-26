@@ -335,10 +335,8 @@ def main():
         import shutil
         shutil.copy2(actions_file, os.path.join(DATA_DIR, "control_actions.json"))
     
-    print("\n[DONE] Pipeline complete! Run the dashboard:")
-    print("  python src/dashboard.py")
-    print(f"  Then open http://localhost:5000")
-    
+    print("\n[DONE] Pipeline complete! The Next.js dashboard will reflect the latest data.")
+    print("  Open http://localhost:3000 to view the results.")
     return comparison
 
 
