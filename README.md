@@ -107,6 +107,13 @@ Open `http://localhost:3000` in your browser.
 - **Dashboard View**: View live comparison metrics (Baseline vs. AI), Energy/Temperature charts, and the 3D Digital Twin.
 - **Pipeline View**: Watch the real-time SSE stream as the EnergyPlus Engine sends sensor data to the LLM, the LLM streams its reasoning token-by-token, and the Runtime Injector pushes the setpoints back into the physics engine.
 
+### Output Artifacts
+
+After the simulation completes, the results are saved in the following directories:
+- **`data/`**: Contains the refined JSON files used by the dashboard to prove energy savings (`results.json`, `baseline_timestep_data.json`, `optimized_timestep_data.json`, `control_actions.json`).
+- **`output/baseline/` & `output/optimized/`**: Contains the raw, verbose EnergyPlus engine artifacts (e.g., `.eso`, `.err`, `.csv`) for deep physical inspection.
+- **`models/generated/`**: Contains the dynamically evaluated IDF files (`baseline_run.idf` and `optimized_run.idf`).
+
 ## Challenges Faced
 
 During the development and testing of this project, we encountered and resolved several technical challenges:
