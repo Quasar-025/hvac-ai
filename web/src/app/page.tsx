@@ -69,7 +69,7 @@ function DashboardContent() {
             </div>
             <div>
               <h1 className="text-2xl font-bold tracking-tight" style={{ color: 'var(--text-primary)' }}>
-                Eco-Loop <span style={{ color: 'var(--accent-primary)', fontWeight: 300 }}>Agents</span>
+                HVAC <span style={{ color: 'var(--accent-primary)', fontWeight: 300 }}>AI</span>
               </h1>
               <p className="text-sm" style={{ color: 'var(--text-tertiary)' }}>
                 Autonomous Building Energy Optimization

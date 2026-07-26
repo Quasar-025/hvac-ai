@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Eco-Loop Agents — Autonomous Building Energy Optimization",
+  title: "HVAC AI — Autonomous Building Energy Optimization",
   description:
     "Real-time AI-driven HVAC optimization using EnergyPlus physics simulation and Qwen 9B LLM agent. Closed-loop runtime injection for maximum comfort and minimum carbon.",
 };
