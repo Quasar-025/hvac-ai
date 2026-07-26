@@ -23,17 +23,17 @@ Traditional EnergyPlus optimization involves statically modifying `.idf` files, 
 - **State Reading**: At each timestep, the wrapper reads current values for `Zone Air Temperature`, `Occupant Count`, `Outdoor Air Drybulb Temperature`, and `Facility Total HVAC Electricity Demand Rate` using the EnergyPlus API state handles.
 - **Actuation**: Once the LLM makes a decision, the wrapper writes directly to the `Heating Setpoint` and `Cooling Setpoint` schedule actuators using `set_actuator_value()`. This pushes the LLM's decisions back into the physics engine *while the simulation is paused mid-timestep*, dynamically altering the building's trajectory.
 
-## 2. LLM Agent Control Loop (`src/llm_agent.py`)
+## 2. Agentic Tool-Calling Architecture (`src/llm_agent.py`)
 
-The core decision-making is handled by `EcoLoopAgent`, interfacing with local LLMs via Ollama.
+The core decision-making is handled by `EcoLoopAgent`, interfacing with local LLMs via Ollama using a rigorous tool-calling approach.
 
-- **Dynamic Model Selection**: By default, it uses Qwen 3.5 9B (`qwen3.5:9b`). This can be easily overridden using the `OLLAMA_MODEL` environment variable to test different local models (e.g., Llama 3). The 7B-9B parameter class offers the perfect balance of low-latency real-time inference and sufficient reasoning capabilities.
-- **Prompt Engineering**: The LLM is provided a heavily engineered system prompt demanding strict JSON responses. It receives a concise state string summarizing the current telemetry (e.g., "Zone temps: avg=22.1°C...").
-- **Streaming Inference**: The agent requests a streaming response from Ollama (`stream=True`), capturing each token as it is generated and triggering a callback. This allows the UI to display a "typewriter" effect of the model's reasoning in real-time.
-- **Hallucination Prevention**: 
-    1. The system prompt strictly enforces structural schema (`{"heating_setpoint": X, "cooling_setpoint": Y}`).
-    2. Post-processing validates data types and clamps temperature bounds (heating 15-24°C, cooling 21-26°C).
-    3. If the LLM hallucinates an invalid response or crashes, a **Rule-Based Fallback Strategy** instantly takes over for that timestep, ensuring the building remains safe and comfortable.
+- **Tool-Calling Architecture**: Rather than relying on unstructured text, the LLM is configured to act as a functional agent. We enforce a strict tool-calling schema where the agent must output valid JSON control parameters (`{"heating_setpoint": X, "cooling_setpoint": Y}`). This JSON object acts as the "tool call" which is immediately parsed and passed into the `PyEnergyPlus` injector.
+- **Prompt Engineering Strategies**: We use a highly condensed, data-dense system prompt to maximize context efficiency. The agent receives a concise state string summarizing only the critical telemetry for the current timestep (e.g., "Zone temps: avg=22.1°C, Occupants: 12, Power: 5.4kW"). We also enforce bounds constraints within the prompt itself to align the agent's behavior with human comfort requirements.
+- **Prompt Latency Management**: Running closed-loop simulations requires millisecond response times. We manage latency through three strategies:
+    1. **Model Selection**: Using Qwen 3.5 9B (`qwen3.5:9b`), which offers the perfect balance of low-latency real-time inference and sufficient reasoning capabilities.
+    2. **Streaming Inference**: The agent streams its response (`stream=True`), capturing each token to give immediate UI feedback without waiting for the full response.
+    3. **Rule-Based Fallback**: If inference exceeds the maximum allowed timestep latency or the model crashes, a fallback rule-based strategy instantly takes over, ensuring the building remains safe and the loop never blocks.
+- **Handling Lengthy Simulation Logs**: Traditional EnergyPlus integrations struggle with parsing massive, gigabyte-sized CSV or SQL output logs after the simulation completes. **Our technical approach bypasses this entirely.** By using PyEnergyPlus for True Runtime Injection, we only read the exact state variables we need directly from memory at the current timestep. We do not parse lengthy simulation logs; we stream the state incrementally, eliminating memory overhead and parsing bottlenecks.
 
 ## 3. MCP Server & Event Bus (`src/mcp_server.py`)
 
