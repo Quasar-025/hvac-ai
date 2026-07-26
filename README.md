@@ -6,7 +6,7 @@ This project uses an LLM to read real-time telemetry from a running EnergyPlus s
 
 ## Architecture Highlights
 - **Physics Engine**: EnergyPlus V26.1.0 with PyEnergyPlus for runtime injection
-- **AI Agent**: Ollama with Qwen 3.5 9B (configurable via environment variables)
+- **AI Agent**: Ollama with Llama 3 (configurable via environment variables)
 - **State Bus**: FastAPI MCP Server with Server-Sent Events (SSE) broadcasting
 - **Frontend**: Next.js App Router, TailwindCSS, Recharts, React Three Fiber (Digital Twin)
 
@@ -31,18 +31,18 @@ pip install -r requirements.txt
 
 ### 2. Ollama & AI Model Setup
 
-Ensure Ollama is running on your machine. By default, the system uses the `qwen3.5:9b` model for its balance of speed and reasoning.
+Ensure Ollama is running on your machine. By default, the system uses the `llama3:latest` model for its balance of speed and reasoning, and reliable strict JSON formatting.
 
 Pull the default model:
 ```bash
-ollama pull qwen3.5:9b
+ollama pull llama3:latest
 ```
 
 *(Optional)* If you want to use a different model, simply pull it and set the `OLLAMA_MODEL` environment variable before running the simulation:
 ```powershell
-# Example: Using Llama 3 8B
-ollama pull llama3
-$env:OLLAMA_MODEL="llama3"
+# Example: Using Qwen 3.5 9B
+ollama pull qwen3.5:9b
+$env:OLLAMA_MODEL="qwen3.5:9b"
 ```
 
 ### 3. Frontend Dashboard Setup
@@ -87,3 +87,9 @@ Open `http://localhost:3000` in your browser.
 
 - **Dashboard View**: View live comparison metrics (Baseline vs. AI), Energy/Temperature charts, and the 3D Digital Twin.
 - **Pipeline View**: Watch the real-time SSE stream as the EnergyPlus Engine sends sensor data to the LLM, the LLM streams its reasoning token-by-token, and the Runtime Injector pushes the setpoints back into the physics engine.
+
+## Challenges Faced
+
+During the development and testing of this project, we encountered and resolved several technical challenges:
+
+**LLM Inference Latency & VRAM Limitations:** We initially used Qwen 3.5 9B for our agent, but we found it was occupying too much GPU VRAM and occasionally caused parsing failures (hallucinated text outside of strict JSON bounds). We switched the default model to **Llama 3** (`llama3:latest`) because its smaller footprint fits perfectly in standard VRAM, it delivers significantly faster response times for real-time control, and it strictly adheres to JSON formatting. The architecture remains fully configurable to scale up to better models depending on available GPU hardware.

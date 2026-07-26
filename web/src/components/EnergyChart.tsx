@@ -86,7 +86,6 @@ export default function EnergyChart({ baseData, optData }: EnergyChartProps) {
           xaxis: { 
             gridcolor: colors.grid, 
             zerolinecolor: colors.zero,
-            nticks: 8,
             tickangle: 0
           },
           yaxis: { 

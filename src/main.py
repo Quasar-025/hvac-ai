@@ -227,7 +227,7 @@ def main():
     parser.add_argument("--interval", type=int, default=24,
                         help="Call LLM every N timesteps (default: 24, which is hourly if 4ts/hr)")
     parser.add_argument("--model", type=str, 
-                        default="huihui_ai/qwen3.5-abliterated:9b",
+                        default=os.environ.get("OLLAMA_MODEL", "llama3:latest"),
                         help="Ollama model name")
     parser.add_argument("--no-mcp", action="store_true",
                         help="Skip starting MCP server")

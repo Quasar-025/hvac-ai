@@ -152,7 +152,7 @@ export default function AgentPipeline() {
                 )}
               </div>
               <div>
-                <h3 className="font-semibold text-sm" style={{ color: 'var(--text-primary)' }}>Qwen 9B Agent</h3>
+                <h3 className="font-semibold text-sm" style={{ color: 'var(--text-primary)' }}>Llama 3 Agent</h3>
                 <p className="text-[10px]" style={{ color: 'var(--text-muted)' }}>
                   {llmStartInfo?.model || 'Comfort & Carbon Optimizer'}
                 </p>

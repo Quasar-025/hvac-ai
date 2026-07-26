@@ -100,7 +100,6 @@ export default function TempChart({ optData }: TempChartProps) {
           xaxis: { 
             gridcolor: colors.grid, 
             zerolinecolor: colors.zero,
-            nticks: 8,
             tickangle: 0
           },
           yaxis: { 

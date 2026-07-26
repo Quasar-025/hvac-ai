@@ -1,7 +1,7 @@
 """
 LLM Agent for Eco-Loop Building Energy Optimization
 
-Uses Ollama with Qwen 3.5 9B for real-time building control decisions.
+Uses Ollama with Llama 3 for real-time building control decisions.
 The agent receives sensor data from EnergyPlus and returns structured 
 control actions (thermostat setpoints) in strict JSON format.
 
@@ -27,7 +27,7 @@ except ImportError:
 import os
 
 # Default model configuration
-DEFAULT_MODEL = os.environ.get("OLLAMA_MODEL", "huihui_ai/qwen3.5-abliterated:9b")
+DEFAULT_MODEL = os.environ.get("OLLAMA_MODEL", "llama3:latest")
 
 # Performance Mode Prompt - 100% Thermal Comfort
 SYSTEM_PROMPT_PERFORMANCE = """You are an AI building energy management agent controlling a 5-zone office HVAC system in Chicago.
@@ -180,7 +180,7 @@ class EcoLoopAgent:
     The agent:
     1. Receives structured sensor data from EnergyPlus
     2. Formats it into a concise prompt
-    3. Sends to Ollama/Qwen for reasoning
+    3. Sends to Ollama/Llama 3 for reasoning
     4. Parses the structured JSON response
     5. Validates and returns control actions
     

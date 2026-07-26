@@ -250,12 +250,16 @@ class EnergyPlusWrapper:
         hour = self.api.exchange.hour(state)
         minute = self.api.exchange.minutes(state)
         
-        # EnergyPlus represents the end of the hour as minute=60
-        if minute == 60:
-            hour += 1
-            minute = 0
-            if hour == 24:
-                hour = 0
+        import datetime
+        try:
+            # Normalize overflow (e.g. minute=60, hour=23) using timedelta
+            dt = datetime.datetime(2026, month, day) + datetime.timedelta(hours=hour, minutes=minute)
+            month = dt.month
+            day = dt.day
+            hour = dt.hour
+            minute = dt.minute
+        except Exception:
+            pass
                 
         warmup = self.api.exchange.warmup_flag(state)
         
