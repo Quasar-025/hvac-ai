@@ -12,65 +12,96 @@ export default function KPIBoard({ results }: KPIProps) {
   const savings = results.savings || {};
   const comfort = results.comfort || {};
 
+  const cards = [
+    {
+      title: 'Energy Saved',
+      value: savings.energy_saved_kwh?.toFixed(1) || '--',
+      unit: 'kWh',
+      subtitle: `${savings.energy_savings_pct?.toFixed(1) || '--'}% reduction vs baseline`,
+      icon: TrendingDown,
+      accentColor: 'var(--accent-secondary)',
+      accentDim: 'var(--accent-secondary-dim)',
+      highlight: true,
+    },
+    {
+      title: 'Baseline Energy',
+      value: savings.baseline_kwh?.toFixed(1) || '--',
+      unit: 'kWh',
+      subtitle: 'Standard rule-based control',
+      icon: Battery,
+      accentColor: 'var(--text-tertiary)',
+      accentDim: 'var(--glass-bg)',
+    },
+    {
+      title: 'AI Optimized Energy',
+      value: savings.optimized_kwh?.toFixed(1) || '--',
+      unit: 'kWh',
+      subtitle: 'Agentic dynamic control',
+      icon: Zap,
+      accentColor: 'var(--accent-primary)',
+      accentDim: 'var(--accent-primary-dim)',
+    },
+    {
+      title: 'Thermal Comfort',
+      value: comfort.optimized_comfort_pct?.toFixed(1) || '--',
+      unit: '%',
+      subtitle: 'Time within bounds (20–25°C)',
+      icon: Thermometer,
+      accentColor: 'var(--accent-warning)',
+      accentDim: 'rgba(251, 191, 36, 0.08)',
+    },
+  ];
+
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-      
-      {/* Energy Saved Card */}
-      <div className="bg-slate-900/40 backdrop-blur-md border border-emerald-500/30 rounded-2xl p-6 shadow-[0_0_30px_rgba(16,185,129,0.1)] relative overflow-hidden group hover:border-emerald-500/50 transition-colors">
-        <div className="absolute -right-6 -top-6 text-emerald-500/10 group-hover:text-emerald-500/20 transition-colors">
-          <TrendingDown size={120} />
-        </div>
-        <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-2">Energy Saved</h3>
-        <div className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-br from-emerald-400 to-teal-200 mb-1">
-          {savings.energy_saved_kwh?.toFixed(1) || '--'} <span className="text-lg font-bold text-emerald-500">kWh</span>
-        </div>
-        <div className="text-sm text-emerald-400/80 font-medium">
-          {savings.energy_savings_pct?.toFixed(1) || '--'}% reduction vs baseline
-        </div>
-      </div>
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
+      {cards.map((card, i) => {
+        const Icon = card.icon;
+        return (
+          <div
+            key={i}
+            className="glass-card p-5 relative overflow-hidden group"
+            style={{
+              borderColor: card.highlight ? card.accentColor : undefined,
+              borderWidth: card.highlight ? '1px' : undefined,
+            }}
+          >
+            {/* Background icon */}
+            <div
+              className="absolute -right-4 -top-4 opacity-[0.06] group-hover:opacity-[0.12] transition-opacity"
+            >
+              <Icon size={100} style={{ color: card.accentColor }} />
+            </div>
 
-      {/* Baseline Energy Card */}
-      <div className="bg-slate-900/40 backdrop-blur-md border border-slate-700/50 rounded-2xl p-6 shadow-xl relative overflow-hidden group hover:border-slate-600 transition-colors">
-        <div className="absolute -right-6 -top-6 text-slate-700/30 group-hover:text-slate-600/50 transition-colors">
-          <Battery size={120} />
-        </div>
-        <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-2">Baseline Energy</h3>
-        <div className="text-3xl font-bold text-slate-200 mb-1">
-          {savings.baseline_kwh?.toFixed(1) || '--'} kWh
-        </div>
-        <div className="text-sm text-slate-500">
-          Standard rule-based control
-        </div>
-      </div>
+            <h3
+              className="text-[11px] font-semibold uppercase tracking-wider mb-2"
+              style={{ color: 'var(--text-tertiary)' }}
+            >
+              {card.title}
+            </h3>
 
-      {/* Optimized Energy Card */}
-      <div className="bg-slate-900/40 backdrop-blur-md border border-slate-700/50 rounded-2xl p-6 shadow-xl relative overflow-hidden group hover:border-slate-600 transition-colors">
-        <div className="absolute -right-6 -top-6 text-blue-500/10 group-hover:text-blue-500/20 transition-colors">
-          <Zap size={120} />
-        </div>
-        <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-2">AI Optimized Energy</h3>
-        <div className="text-3xl font-bold text-slate-200 mb-1">
-          {savings.optimized_kwh?.toFixed(1) || '--'} kWh
-        </div>
-        <div className="text-sm text-slate-500">
-          Agentic dynamic control
-        </div>
-      </div>
+            <div className="flex items-baseline gap-1.5 mb-1">
+              <span
+                className="text-3xl font-black"
+                style={{
+                  color: card.highlight ? card.accentColor : 'var(--text-primary)',
+                }}
+              >
+                {card.value}
+              </span>
+              <span
+                className="text-sm font-bold"
+                style={{ color: card.accentColor }}
+              >
+                {card.unit}
+              </span>
+            </div>
 
-      {/* Thermal Comfort Card */}
-      <div className="bg-slate-900/40 backdrop-blur-md border border-slate-700/50 rounded-2xl p-6 shadow-xl relative overflow-hidden group hover:border-slate-600 transition-colors">
-        <div className="absolute -right-6 -top-6 text-orange-500/10 group-hover:text-orange-500/20 transition-colors">
-          <Thermometer size={120} />
-        </div>
-        <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-2">Thermal Comfort</h3>
-        <div className="text-3xl font-bold text-slate-200 mb-1">
-          {comfort.optimized_comfort_pct?.toFixed(1) || '--'}%
-        </div>
-        <div className="text-sm text-slate-500">
-          Time within bounds (20-25°C)
-        </div>
-      </div>
-
+            <div className="text-xs font-medium" style={{ color: 'var(--text-muted)' }}>
+              {card.subtitle}
+            </div>
+          </div>
+        );
+      })}
     </div>
   );
 }

@@ -24,8 +24,10 @@ except ImportError:
     ollama = None
 
 
+import os
+
 # Default model configuration
-DEFAULT_MODEL = "huihui_ai/qwen3.5-abliterated:9b"
+DEFAULT_MODEL = os.environ.get("OLLAMA_MODEL", "huihui_ai/qwen3.5-abliterated:9b")
 
 # Performance Mode Prompt - 100% Thermal Comfort
 SYSTEM_PROMPT_PERFORMANCE = """You are an AI building energy management agent controlling a 5-zone office HVAC system in Chicago.
@@ -206,12 +208,15 @@ class EcoLoopAgent:
         except Exception as e:
             raise RuntimeError(f"Cannot connect to Ollama: {e}")
 
-    def reason_and_act(self, sensor_data: dict) -> dict:
+    def reason_and_act(self, sensor_data: dict, event_callback=None) -> dict:
         """
         Main agent method: takes sensor data, returns control actions.
         
         Args:
             sensor_data: Dict from EnergyPlusWrapper.get_sensor_data()
+            event_callback: Optional callable(event_type: str, data: dict) 
+                           for real-time streaming of LLM reasoning to the frontend.
+                           Events: "llm_start", "llm_chunk", "llm_done"
             
         Returns:
             Dict with heating_setpoint, cooling_setpoint, reasoning
@@ -225,25 +230,44 @@ class EcoLoopAgent:
             print(f"\n[AGENT] Call #{self.call_count}")
             print(f"[AGENT] Prompt: {user_prompt}")
         
+        # Notify frontend that LLM is starting
+        if event_callback:
+            event_callback("llm_start", {
+                "call_number": self.call_count,
+                "model": self.model,
+                "prompt_preview": user_prompt[:200],
+            })
+        
         start = time.time()
         
         for attempt in range(3):
             try:
-                # Call Ollama
-                response = ollama.chat(
+                # Use streaming to send tokens in real-time
+                response_text = ""
+                stream = ollama.chat(
                     model=self.model,
                     format="json",
                     options={"num_ctx": 4096},
+                    stream=True,
                     messages=[
                         {"role": "system", "content": self.system_prompt},
                         {"role": "user", "content": user_prompt}
                     ]
                 )
                 
+                for chunk in stream:
+                    token = chunk.get("message", {}).get("content", "")
+                    if token:
+                        response_text += token
+                        # Stream each token to the frontend
+                        if event_callback:
+                            event_callback("llm_chunk", {
+                                "token": token,
+                                "accumulated": response_text,
+                            })
+                
                 latency = time.time() - start
                 self.total_latency += latency
-                
-                response_text = response["message"]["content"]
                 
                 if self.verbose:
                     print(f"[AGENT] Response ({latency:.1f}s): {response_text}")
@@ -256,6 +280,15 @@ class EcoLoopAgent:
                     if self.verbose:
                         print(f"[AGENT] Actions: htg={actions['heating_setpoint']}°C, "
                               f"clg={actions['cooling_setpoint']}°C")
+                    
+                    # Notify frontend that LLM is done
+                    if event_callback:
+                        event_callback("llm_done", {
+                            "actions": actions,
+                            "latency_s": round(latency, 2),
+                            "attempt": attempt + 1,
+                        })
+                    
                     return actions
                 else:
                     print(f"[WARN] Failed to parse response, attempt {attempt + 1}/3")
@@ -267,7 +300,17 @@ class EcoLoopAgent:
         
         # Fallback: rule-based strategy
         self.fallback_count += 1
-        return self._rule_based_fallback(sensor_data)
+        fallback_actions = self._rule_based_fallback(sensor_data)
+        
+        # Notify frontend about fallback
+        if event_callback:
+            event_callback("llm_done", {
+                "actions": fallback_actions,
+                "latency_s": round(time.time() - start, 2),
+                "fallback": True,
+            })
+        
+        return fallback_actions
 
     def _rule_based_fallback(self, sensor_data: dict) -> dict:
         """

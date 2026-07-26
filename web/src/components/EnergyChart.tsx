@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 
 const Plot = dynamic(() => import('react-plotly.js'), { ssr: false });
@@ -10,7 +11,42 @@ interface EnergyChartProps {
 }
 
 export default function EnergyChart({ baseData, optData }: EnergyChartProps) {
-  if (!baseData.length || !optData.length) return <div className="h-[300px] flex items-center justify-center text-slate-500">Loading chart...</div>;
+  const [colors, setColors] = useState({
+    grid: 'rgba(255,255,255,0.04)',
+    zero: 'rgba(255,255,255,0.08)',
+    text: '#94a3b8',
+    baseline: '#94a3b8',
+    optimized: '#34d399',
+    fill: 'rgba(52, 211, 153, 0.08)',
+  });
+
+  useEffect(() => {
+    const updateColors = () => {
+      const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+      setColors({
+        grid: isLight ? 'rgba(0,0,0,0.04)' : 'rgba(255,255,255,0.04)',
+        zero: isLight ? 'rgba(0,0,0,0.08)' : 'rgba(255,255,255,0.08)',
+        text: isLight ? '#64748b' : '#94a3b8',
+        baseline: isLight ? '#94a3b8' : '#94a3b8',
+        optimized: isLight ? '#059669' : '#34d399',
+        fill: isLight ? 'rgba(5, 150, 105, 0.06)' : 'rgba(52, 211, 153, 0.08)',
+      });
+    };
+
+    updateColors();
+    // Watch for theme changes
+    const observer = new MutationObserver(updateColors);
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+    return () => observer.disconnect();
+  }, []);
+
+  if (!baseData.length || !optData.length) {
+    return (
+      <div className="h-[300px] flex items-center justify-center" style={{ color: 'var(--text-muted)' }}>
+        Loading chart...
+      </div>
+    );
+  }
 
   const timeBase = baseData.map(d => new Date(2026, d.month - 1, d.day, d.hour, d.minute));
   const timeOpt = optData.map(d => new Date(2026, d.month - 1, d.day, d.hour, d.minute));
@@ -28,7 +64,7 @@ export default function EnergyChart({ baseData, optData }: EnergyChartProps) {
             type: 'scatter',
             mode: 'lines',
             name: 'Baseline',
-            line: { color: '#94a3b8', width: 2, dash: 'dot' }
+            line: { color: colors.baseline, width: 2, dash: 'dot' }
           },
           {
             x: timeOpt,
@@ -36,24 +72,28 @@ export default function EnergyChart({ baseData, optData }: EnergyChartProps) {
             type: 'scatter',
             mode: 'lines',
             name: 'AI Optimized',
-            line: { color: '#10b981', width: 3 },
+            line: { color: colors.optimized, width: 3 },
             fill: 'tonexty',
-            fillcolor: 'rgba(16, 185, 129, 0.1)'
+            fillcolor: colors.fill
           }
         ]}
         layout={{
           autosize: true,
           paper_bgcolor: 'rgba(0,0,0,0)',
           plot_bgcolor: 'rgba(0,0,0,0)',
-          font: { color: '#94a3b8', family: 'Inter, sans-serif' },
+          font: { color: colors.text, family: 'Inter, sans-serif' },
           margin: { t: 10, r: 10, b: 40, l: 50 },
           xaxis: { 
-            gridcolor: 'rgba(255,255,255,0.05)', 
-            zerolinecolor: 'rgba(255,255,255,0.1)',
+            gridcolor: colors.grid, 
+            zerolinecolor: colors.zero,
             nticks: 8,
             tickangle: 0
           },
-          yaxis: { gridcolor: 'rgba(255,255,255,0.05)', zerolinecolor: 'rgba(255,255,255,0.1)', title: 'Energy (kWh)' },
+          yaxis: { 
+            gridcolor: colors.grid, 
+            zerolinecolor: colors.zero, 
+            title: 'Energy (kWh)' 
+          },
           legend: { orientation: 'h', y: -0.2 }
         }}
         config={{ responsive: true, displayModeBar: false }}

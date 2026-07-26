@@ -75,7 +75,7 @@ def run_simulation(mode: str, wrapper: EnergyPlusWrapper,
     enable_ai = (mode == "optimized")
     
     def agent_callback(sensor_data):
-        """Callback that bridges EnergyPlus → MCP → LLM → EnergyPlus."""
+        """Callback that bridges EnergyPlus → MCP → LLM → EnergyPlus with SSE streaming."""
         global STOP_SIMULATION
         if STOP_SIMULATION:
             print("[INFO] Aborting from inside EnergyPlus callback...")
@@ -84,11 +84,58 @@ def run_simulation(mode: str, wrapper: EnergyPlusWrapper,
         # Update MCP server state
         mcp_server.update_state(sensor_data)
         
+        # Broadcast sensor data to SSE clients
+        mcp_server._pipeline_phase = "sensing"
+        mcp_server._last_sensor = {
+            "timestamp": sensor_data.get("timestamp", ""),
+            "outdoor_temp_c": sensor_data.get("outdoor_temp_c", 0),
+            "hvac_power_w": sensor_data.get("hvac_power_w", 0),
+            "zones": {k: {"temp_c": v.get("temp_c", 0), "occupancy": v.get("occupancy", 0), "co2_ppm": v.get("co2_ppm", 400)} 
+                      for k, v in sensor_data.get("zones", {}).items()},
+            "grid_carbon_intensity_g_kwh": sensor_data.get("grid_carbon_intensity_g_kwh", 300),
+        }
+        mcp_server.broadcast("pipeline:sensor", mcp_server._last_sensor)
+        mcp_server.broadcast("pipeline:phase", {"phase": "sensing"})
+        
+        # Update live metrics on every sensor read (so KPIs update even between AI calls)
+        mcp_server.update_live_metrics(sensor_data)
+        mcp_server.broadcast("pipeline:metrics", mcp_server._live_metrics)
+        
         if agent:
-            # Get AI decision
-            actions = agent.reason_and_act(sensor_data)
+            # Create event callback that broadcasts LLM events via SSE
+            def llm_event_callback(event_type, data):
+                if event_type == "llm_start":
+                    mcp_server._pipeline_phase = "thinking"
+                    mcp_server.broadcast("pipeline:phase", {"phase": "thinking"})
+                    mcp_server.broadcast("pipeline:llm_start", data)
+                elif event_type == "llm_chunk":
+                    mcp_server.broadcast("pipeline:llm_chunk", {"token": data.get("token", "")})
+                elif event_type == "llm_done":
+                    mcp_server._last_llm_response = data
+                    mcp_server.broadcast("pipeline:llm_done", data)
+            
+            # Get AI decision with streaming
+            actions = agent.reason_and_act(sensor_data, event_callback=llm_event_callback)
+            
             # Log action to MCP server
             mcp_server.log_action(actions)
+            
+            # Broadcast injection event
+            mcp_server._pipeline_phase = "injecting"
+            mcp_server._last_injection = {
+                "heating_setpoint": actions.get("heating_setpoint"),
+                "cooling_setpoint": actions.get("cooling_setpoint"),
+                "reasoning": actions.get("reasoning", ""),
+            }
+            mcp_server.broadcast("pipeline:phase", {"phase": "injecting"})
+            mcp_server.broadcast("pipeline:injection", mcp_server._last_injection)
+            
+            # Brief pause to let frontend show injection state before returning to idle
+            import time as _time
+            _time.sleep(0.3)
+            mcp_server._pipeline_phase = "idle"
+            mcp_server.broadcast("pipeline:phase", {"phase": "idle"})
+            
             return actions
         return None
 
