@@ -406,11 +406,13 @@ class EnergyPlusWrapper:
                     actions = self.agent_callback(sensor_data)
                     if actions and isinstance(actions, dict):
                         self._last_actions = actions
-                        self.apply_control_actions(state, actions)
                 except Exception as e:
                     print(f"[WARN] AI agent error at ts={self.timestep_count}: {e}")
-                    if self._last_actions:
-                        self.apply_control_actions(state, self._last_actions)
+            
+            # CRITICAL: Actuators must be set on EVERY timestep in EnergyPlus, 
+            # otherwise they revert to the default IDF schedules!
+            if self._last_actions:
+                self.apply_control_actions(state, self._last_actions)
                 
                 # Periodically save data to disk so the dashboard updates live!
                 try:
