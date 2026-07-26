@@ -438,22 +438,24 @@ class EnergyPlusWrapper:
                     sample_rate = max(1, len(self.timestep_data) // 2000)
                     sampled_data = self.timestep_data[::sample_rate]
                     
+                    def atomic_write_json(data, filepath):
+                        tmp_path = filepath + ".tmp"
+                        with open(tmp_path, "w") as f:
+                            json.dump(data, f, indent=2)
+                        os.replace(tmp_path, filepath)
+
                     # Save to output_dir
-                    with open(os.path.join(self.output_dir, f"{mode}_timestep_data.json"), "w") as f:
-                        json.dump(sampled_data, f, indent=2)
+                    atomic_write_json(sampled_data, os.path.join(self.output_dir, f"{mode}_timestep_data.json"))
                     
                     # Save to data_dir for UI live updates
-                    with open(os.path.join(data_dir, f"{mode}_timestep_data.json"), "w") as f:
-                        json.dump(sampled_data, f, indent=2)
+                    atomic_write_json(sampled_data, os.path.join(data_dir, f"{mode}_timestep_data.json"))
                         
                     if self.control_actions_log:
                         # Save to output_dir
-                        with open(os.path.join(self.output_dir, f"{mode}_control_actions.json"), "w") as f:
-                            json.dump(self.control_actions_log[-50:], f, indent=2)
+                        atomic_write_json(self.control_actions_log[-50:], os.path.join(self.output_dir, f"{mode}_control_actions.json"))
                             
                         # Save to data_dir with the name the UI expects
-                        with open(os.path.join(data_dir, "control_actions.json"), "w") as f:
-                            json.dump(self.control_actions_log[-50:], f, indent=2)
+                        atomic_write_json(self.control_actions_log[-50:], os.path.join(data_dir, "control_actions.json"))
                 except Exception as e:
                     print(f"[WARN] Failed to write live data: {e}")
 
