@@ -333,7 +333,7 @@ class EnergyPlusWrapper:
         
         return data
 
-    def apply_control_actions(self, state, actions: dict):
+    def apply_control_actions(self, state, actions: dict, log_action: bool = True):
         """
         Apply AI control actions to the running simulation via actuators.
         
@@ -367,13 +367,14 @@ class EnergyPlusWrapper:
                     state, self._clg_actuator_handles[zone], clg_sp
                 )
         
-        # Log the action
-        self.control_actions_log.append({
-            "timestep": self.timestep_count,
-            "heating_setpoint": round(htg_sp, 1),
-            "cooling_setpoint": round(clg_sp, 1),
-            "reasoning": actions.get("reasoning", ""),
-        })
+        # Log the action only when requested
+        if log_action:
+            self.control_actions_log.append({
+                "timestep": self.timestep_count,
+                "heating_setpoint": round(htg_sp, 1),
+                "cooling_setpoint": round(clg_sp, 1),
+                "reasoning": actions.get("reasoning", ""),
+            })
 
     def _callback_timestep(self, state):
         """
@@ -412,7 +413,8 @@ class EnergyPlusWrapper:
             # CRITICAL: Actuators must be set on EVERY timestep in EnergyPlus, 
             # otherwise they revert to the default IDF schedules!
             if self._last_actions:
-                self.apply_control_actions(state, self._last_actions)
+                is_ai_call_timestep = (self.timestep_count % self.ai_call_interval == 0)
+                self.apply_control_actions(state, self._last_actions, log_action=is_ai_call_timestep)
                 
                 # Periodically save data to disk so the dashboard updates live!
                 try:
