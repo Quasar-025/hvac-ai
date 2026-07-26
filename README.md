@@ -1,4 +1,4 @@
-# Eco-Loop Building Agents
+# HVAC AI
 
 An autonomous building energy optimization system leveraging True Runtime Injection (PyEnergyPlus) and Local LLMs (Ollama) to perform real-time, closed-loop HVAC control.
 
@@ -24,8 +24,8 @@ For a detailed architecture breakdown, see [ARCHITECTURE.md](ARCHITECTURE.md).
 
 Clone the repository and install the dependencies:
 ```bash
-git clone <your-repo>
-cd honeywell
+git clone https://github.com/Quasar-025/hvac-ai.git
+cd hvac-ai
 pip install -r requirements.txt
 ```
 
