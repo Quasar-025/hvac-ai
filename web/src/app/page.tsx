@@ -132,7 +132,7 @@ function DashboardContent() {
         ) : (
           <>
             {/* KPI Section — use live SSE metrics during simulation, file-based results after */}
-            <KPIBoard results={results || sse.liveMetrics} />
+            <KPIBoard results={sse.liveMetrics || results} />
 
             {/* Conditional Views */}
             {viewMode === 'dashboard' ? (
